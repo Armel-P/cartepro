@@ -51,3 +51,4 @@ csv = "1.4.0"
 
 # Error handling
 anyhow = "1.0.104"
+chrono = "0.4.45"
