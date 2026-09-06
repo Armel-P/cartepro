@@ -1,23 +1,21 @@
 use crate::{
-    {
-        db::get_all,
-        entities::transaction::{self as Transaction}
-    }
+    db::get_all,
+    entities::transaction::{self as Transaction},
 };
 use actix_web::{HttpResponse, Responder, get, web};
-use sea_orm::{DatabaseConnection};
 use csv::Writer;
+use sea_orm::DatabaseConnection;
 
 #[get("/v1/admin/transactions.csv")]
 pub async fn transactions_to_csv(db: web::Data<DatabaseConnection>) -> impl Responder {
     let transactions = match get_all::<Transaction::Entity, _>(db.get_ref()).await {
         Ok(transactions) => transactions,
-        Err(err) => return HttpResponse::InternalServerError().body(err.to_string())
+        Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
     let mut writer = Writer::from_writer(Vec::new());
 
     for transaction in transactions {
-        writer.serialize(transaction);
+        writer.serialize(transaction).ok();
     }
 
     match writer.into_inner() {
@@ -28,6 +26,6 @@ pub async fn transactions_to_csv(db: web::Data<DatabaseConnection>) -> impl Resp
                 "attachment; filename=\"transactions.csv\"",
             ))
             .body(file),
-        Err(err) => HttpResponse::InternalServerError().body(err.to_string())
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
