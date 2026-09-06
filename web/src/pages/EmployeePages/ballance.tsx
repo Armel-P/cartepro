@@ -7,6 +7,7 @@ import {
 } from "../../components/ui/card"
 import { Separator } from "../../components/ui/separator"
 import { Watermark } from "../../components/Watermark"
+import { FeaturedPartnerBanner } from "../../components/FeaturedPartnerBanner"
 
 const PLACEHOLDER_BALANCE = "128,50 €"
 
@@ -31,6 +32,8 @@ export default function BalancePage() {
     <Watermark text="SIMULATION SOLDE ET HISTORIQUE">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <h1 className="text-2xl font-semibold">Mon solde</h1>
+
+        <FeaturedPartnerBanner />
 
         <Card>
           <CardHeader>
