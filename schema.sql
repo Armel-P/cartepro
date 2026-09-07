@@ -24,7 +24,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: admin; Type: TABLE; Schema: public; Owner: tickettout
+-- Name: admin; Type: TABLE; Schema: public; Owner: cartepro
 --
 
 CREATE TABLE public.admin (
@@ -32,10 +32,10 @@ CREATE TABLE public.admin (
 );
 
 
-ALTER TABLE public.admin OWNER TO tickettout;
+ALTER TABLE public.admin OWNER TO cartepro;
 
 --
--- Name: employee; Type: TABLE; Schema: public; Owner: tickettout
+-- Name: employee; Type: TABLE; Schema: public; Owner: cartepro
 --
 
 CREATE TABLE public.employee (
@@ -46,28 +46,26 @@ CREATE TABLE public.employee (
 );
 
 
-ALTER TABLE public.employee OWNER TO tickettout;
+ALTER TABLE public.employee OWNER TO cartepro;
 
 --
--- Name: partner; Type: TABLE; Schema: public; Owner: tickettout
---
+-- Name: partner; Type: TABLE; Schema: public; Owner: cartepro
+-- --
 
 CREATE TABLE public.partner (
     id uuid NOT NULL,
     coordinate point,
     siren integer,
     social_obj character varying(255),
-    highlight boolean,
-    highlight_text character varying(255),
     verification boolean,
     category character varying(255)
 );
 
 
-ALTER TABLE public.partner OWNER TO tickettout;
+ALTER TABLE public.partner OWNER TO cartepro;
 
 --
--- Name: state; Type: TABLE; Schema: public; Owner: tickettout
+-- Name: state; Type: TABLE; Schema: public; Owner: cartepro
 --
 
 CREATE TABLE public.state (
@@ -78,10 +76,10 @@ CREATE TABLE public.state (
 );
 
 
-ALTER TABLE public.state OWNER TO tickettout;
+ALTER TABLE public.state OWNER TO cartepro;
 
 --
--- Name: transaction; Type: TABLE; Schema: public; Owner: tickettout
+-- Name: transaction; Type: TABLE; Schema: public; Owner: cartepro
 --
 
 CREATE TABLE public.transaction (
@@ -94,10 +92,10 @@ CREATE TABLE public.transaction (
 );
 
 
-ALTER TABLE public.transaction OWNER TO tickettout;
+ALTER TABLE public.transaction OWNER TO cartepro;
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: tickettout
+-- Name: users; Type: TABLE; Schema: public; Owner: cartepro
 --
 
 CREATE TABLE public.users (
@@ -110,10 +108,10 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO tickettout;
+ALTER TABLE public.users OWNER TO cartepro;
 
 --
--- Name: admin admin_pkey; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: admin admin_pkey; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.admin
@@ -121,7 +119,7 @@ ALTER TABLE ONLY public.admin
 
 
 --
--- Name: employee employee_pkey; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: employee employee_pkey; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.employee
@@ -129,7 +127,7 @@ ALTER TABLE ONLY public.employee
 
 
 --
--- Name: partner partner_pkey; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: partner partner_pkey; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.partner
@@ -137,7 +135,7 @@ ALTER TABLE ONLY public.partner
 
 
 --
--- Name: partner partner_siren_key; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: partner partner_siren_key; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.partner
@@ -145,7 +143,7 @@ ALTER TABLE ONLY public.partner
 
 
 --
--- Name: state state_pkey; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: state state_pkey; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.state
@@ -153,7 +151,7 @@ ALTER TABLE ONLY public.state
 
 
 --
--- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.transaction
@@ -161,7 +159,7 @@ ALTER TABLE ONLY public.transaction
 
 
 --
--- Name: users users_mail_key; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: users users_mail_key; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.users
@@ -169,7 +167,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.users
@@ -177,7 +175,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: admin admin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: admin admin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.admin
@@ -185,7 +183,7 @@ ALTER TABLE ONLY public.admin
 
 
 --
--- Name: employee employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: employee employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.employee
@@ -193,7 +191,7 @@ ALTER TABLE ONLY public.employee
 
 
 --
--- Name: partner partner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: partner partner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.partner
@@ -201,7 +199,7 @@ ALTER TABLE ONLY public.partner
 
 
 --
--- Name: state state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: state state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.state
@@ -209,7 +207,7 @@ ALTER TABLE ONLY public.state
 
 
 --
--- Name: transaction transaction_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: transaction transaction_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.transaction
@@ -217,7 +215,7 @@ ALTER TABLE ONLY public.transaction
 
 
 --
--- Name: transaction transaction_partner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tickettout
+-- Name: transaction transaction_partner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cartepro
 --
 
 ALTER TABLE ONLY public.transaction

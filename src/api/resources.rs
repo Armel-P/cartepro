@@ -50,7 +50,6 @@ pub struct CreatePartnerDto {
 #[derive(Deserialize)]
 pub struct UpdatePartnerDto {
     pub social_obj: Option<String>,
-    pub highlight: Option<bool>,
     pub verification: Option<bool>,
 }
 
@@ -74,9 +73,6 @@ impl CrudAdapter<partner::Entity> for PartnerAdapter {
         let mut am = model.into_active_model();
         if let Some(s) = dto.social_obj {
             am.social_obj = ActiveValue::Set(Some(s));
-        }
-        if let Some(h) = dto.highlight {
-            am.highlight = ActiveValue::Set(Some(h));
         }
         if let Some(v) = dto.verification {
             am.verification = ActiveValue::Set(Some(v));

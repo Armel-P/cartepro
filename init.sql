@@ -26,8 +26,6 @@ CREATE TABLE partner (
   coordinate POINT,
   siren INT4 UNIQUE,
   social_obj VARCHAR(255),
-  highlight BOOL,
-  highlight_text VARCHAR(255),
   verification BOOL,
   category VARCHAR(255)
 );
