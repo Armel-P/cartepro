@@ -1,12 +1,17 @@
 use actix_web::web;
+use crate::{
+    models::{Role}
+};
+use utoipa::OpenApi;
 
 mod auth;
 mod crud;
-mod csv;
 mod echo;
 mod health;
 mod resources;
 mod user;
+mod csv;
+mod docs;
 mod users;
 
 use crate::entities::{admin, employee, partner, state};
@@ -17,11 +22,10 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         web::scope("/api")
             .service(health::health)
             .service(echo::echo)
-            .service(user::get)
-            .service(user::pass)
-            .service(user::put)
             .service(csv::transactions_to_csv)
+            .configure(user::configure)
             .configure(auth::configure)
+            .configure(docs::configure)
             .service(crud::crud_scope::<employee::Entity, EmployeeAdapter>(
                 "/employees",
             ))
@@ -32,3 +36,26 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .service(crud::crud_scope::<admin::Entity, AdminAdapter>("/admins")),
     );
 }
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        health::health,
+        echo::echo,
+        csv::transactions_to_csv,
+        user::get,
+        user::pass,
+        user::put,
+        user::delete,
+        auth::login,
+        auth::register,
+    ),
+    components(
+        schemas(
+            Role,
+            user::GetResponse, user::PassRequest, user::PutRequest,
+            auth::LoginRequest, auth::RegisterRequest, auth::AuthResponse,
+        )
+    )
+)]
+pub struct ApiDoc;
