@@ -55,3 +55,4 @@ utoipa-swagger-ui = { version = "9", features = ["actix-web"] }
 
 # Error handling
 anyhow = "1.0.104"
+chrono = "0.4.45"
