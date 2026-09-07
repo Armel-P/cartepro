@@ -45,12 +45,12 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
             p-[6%]
             backface-hidden
           "
-          style={{ backgroundColor: "#1B3A6B" }}
+          style={{ backgroundColor: "#7E2534" }}
         >
           {/* Logo central */}
           <img
             src="/public/blue_logo.png"
-            alt="TicketTout"
+            alt="CartePro"
             className="
               absolute
               left-3/5
@@ -68,12 +68,12 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
             {/* Header */}
             <div className="flex justify-between items-start">
               <div>
-                {}
+                { }
               </div>
 
               <img
-                src="/public/tickettout_blue_logo.png"
-                alt="TicketTout"
+                src="/public/tickettout_red_logo.png"
+                alt="CartePro"
                 className="
                   h-[clamp(18px,5vw,40px)]
                   w-auto
@@ -120,7 +120,7 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
             </div>
 
             <div className="m-16">
-              {}
+              { }
             </div>
 
             {/* Footer */}
@@ -183,7 +183,7 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
             backface-hidden
             transform-[rotateY(180deg)]
           "
-          style={{ backgroundColor: "#1B3A6B" }}
+          style={{ backgroundColor: "#7E2534" }}
         >
           {/* Bande magnétique */}
           <div

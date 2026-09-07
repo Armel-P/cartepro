@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import {
   Card,
   CardContent,
@@ -7,8 +8,39 @@ import {
 } from "../../components/ui/card"
 import { Separator } from "../../components/ui/separator"
 import { Watermark } from "../../components/Watermark"
+import { FeaturedPartnerBanner } from "../../components/FeaturedPartnerBanner"
+import { api } from "../../api"
+import { getUser } from "../../auth"
 
-const PLACEHOLDER_BALANCE = "128,50 €"
+type Employee = {
+  id: string
+  balance: number | null
+}
+
+function formatBalance(value: number): string {
+  return value.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })
+}
+
+const POSITIVE_BALANCE_MESSAGES: ((amount: string) => string)[] = [
+  (amount) => `${amount} à dépenser chez vos partenaires préférés !`,
+  (amount) => `${amount} rien que pour vous faire plaisir.`,
+  (amount) => `${amount} disponibles pour profiter de la vie.`,
+  (amount) => `${amount} prêts à être croqués chez nos partenaires.`,
+  (amount) => `${amount} pour vous chouchouter aujourd'hui.`,
+  (amount) => `${amount}, de quoi se faire plaisir sans culpabiliser.`,
+  (amount) => `${amount} qui n'attendent qu'à être dépensés !`,
+  (amount) => `${amount} de bonheur en réserve.`,
+  (amount) => `${amount} pour une pause bien méritée.`,
+  (amount) => `${amount} à croquer partout où vous voulez.`,
+]
+
+function pickRandomMessage(amount: string): string {
+  const template =
+    POSITIVE_BALANCE_MESSAGES[
+      Math.floor(Math.random() * POSITIVE_BALANCE_MESSAGES.length)
+    ]
+  return template(amount)
+}
 
 type Transaction = {
   id: string
@@ -27,16 +59,76 @@ const PLACEHOLDER_TRANSACTIONS: Transaction[] = [
 ]
 
 export default function BalancePage() {
+  const [balance, setBalance] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    const user = getUser()
+    if (!user) {
+      setError("Vous devez être connecté pour consulter votre solde.")
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setLoading(true)
+    api<Employee>(`/employees/${user.id}`)
+      .then((employee) => {
+        if (cancelled) return
+        setBalance(employee.balance ?? null)
+        setError(null)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setError("Impossible de récupérer votre solde pour le moment.")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (balance !== null) {
+      setMessage(pickRandomMessage(formatBalance(balance)))
+    }
+  }, [balance])
+
   return (
-    <Watermark text="SIMULATION SOLDE ET HISTORIQUE">
+    <Watermark text="SOLDE RÉEL — HISTORIQUE SIMULÉ">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <h1 className="text-2xl font-semibold">Mon solde</h1>
+
+        <FeaturedPartnerBanner />
 
         <Card>
           <CardHeader>
             <CardDescription>Solde disponible</CardDescription>
-            <CardTitle className="text-4xl">{PLACEHOLDER_BALANCE}</CardTitle>
+            <CardTitle className="text-4xl">
+              {loading
+                ? "…"
+                : balance !== null
+                  ? formatBalance(balance)
+                  : "—"}
+            </CardTitle>
           </CardHeader>
+          <CardContent>
+            {error ? (
+              <p className="text-sm text-destructive">{error}</p>
+            ) : (
+              !loading &&
+              message && (
+                <p className="text-sm font-medium text-brand-accent">
+                  {message}
+                </p>
+              )
+            )}
+          </CardContent>
         </Card>
 
         <Card>

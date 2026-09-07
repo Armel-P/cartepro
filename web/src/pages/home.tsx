@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom"
 import { buttonVariants } from "../components/ui/button"
 import { Watermark } from "../components/Watermark"
+import { Footer } from "../components/Footer"
 
 const features = [
   {
     title: "Solde en temps réel",
-    description: "Consultez à tout moment le montant disponible sur votre Ticket Tout.",
+    description: "Consultez à tout moment le montant disponible sur votre CartePro.",
   },
   {
     title: "Paiement par QR code",
@@ -22,14 +23,20 @@ export default function HomePage() {
     <div className="flex h-svh flex-col overflow-hidden bg-background">
       <header className="sticky top-0 z-10 shrink-0 border-b border-border bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/public/favicon.png" alt="" className="h-8 w-8" />
-            <span className="text-lg font-semibold text-primary">Ticket Tout</span>
+          <Link
+            to="/"
+            className="font-heading text-lg font-semibold text-primary"
+          >
+            CartePro
           </Link>
           <nav className="flex items-center gap-2">
             <Link
               to="/login"
-              className={buttonVariants({ variant: "ghost", size: "sm" })}
+              className={buttonVariants({
+                variant: "ghost",
+                size: "sm",
+                className: "text-primary hover:text-primary!",
+              })}
             >
               Se connecter
             </Link>
@@ -50,12 +57,12 @@ export default function HomePage() {
         <section className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 overflow-hidden px-6 py-8 md:grid-cols-2">
           <div className="flex flex-col gap-6">
             <span className="text-sm font-semibold uppercase tracking-wide text-brand-accent">
-              Titres-Tout dématérialisés
+              Avantages salariés dématérialisés
             </span>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
-              Votre Ticket Tout,
+              Votre CartePro,
               <br />
-              partout, tout le temps.
+              partout, à tout moment.
             </h1>
             <p className="max-w-md text-lg text-muted-foreground">
               Consultez votre solde, payez chez nos partenaires par QR code et
@@ -77,7 +84,7 @@ export default function HomePage() {
           <div className="relative mx-auto w-full max-w-md">
             <img
               src="/public/carte_tickettout.png"
-              alt="Carte Ticket Tout"
+              alt="Carte CartePro"
               className="w-full rounded-2xl shadow-xl"
             />
             <div className="absolute -right-4 -top-4 -z-10 h-24 w-24 rounded-full bg-brand-accent/15" />
@@ -99,6 +106,8 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        <Footer />
       </Watermark>
     </div>
   )
