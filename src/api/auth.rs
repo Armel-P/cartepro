@@ -8,11 +8,7 @@ use crate::{
     entities::{employee, partner, user::{self as User}},
     models::Role,
 };
-use utoipa::{self, ToSchema};
-use actix_web::{HttpResponse, Responder, post, web};
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use utoipa::ToSchema;
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {

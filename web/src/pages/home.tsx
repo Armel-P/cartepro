@@ -83,7 +83,7 @@ export default function HomePage() {
 
           <div className="relative mx-auto w-full max-w-md">
             <img
-              src="/public/carte_tickettout.png"
+              src="/public/carte_cartepro.png"
               alt="Carte CartePro"
               className="w-full rounded-2xl shadow-xl"
             />

@@ -72,7 +72,7 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
               </div>
 
               <img
-                src="/public/tickettout_red_logo.png"
+                src="/public/cartepro.png"
                 alt="CartePro"
                 className="
                   h-[clamp(18px,5vw,40px)]
