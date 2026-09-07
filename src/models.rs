@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
+use utoipa::{ToSchema};
 use crate::Result;
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, ToSchema)]
 pub enum Role {
     Admin,
     Partner,

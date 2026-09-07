@@ -1,21 +1,21 @@
-use actix_web::{HttpResponse, Responder, post, web};
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
 use crate::{
     db::{get_one, insert},
     entities::user::{self as User},
     models::Role,
 };
+use utoipa::{self, ToSchema};
+use actix_web::{HttpResponse, Responder, post, web};
+use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {
     pub mail: String,
     pub password: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct AuthResponse {
     pub id: Uuid,
     pub mail: String,
@@ -23,6 +23,16 @@ pub struct AuthResponse {
     pub role: Role,
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/login",
+    request_body = LoginRequest,
+    responses(
+        (status = 200, description = "Successfully authenticated", content_type = "application/json", body = AuthResponse),
+        (status = 401, description = "Invalid email or password"),
+        (status = 500, description = "Internal server error")
+    )
+)]
 #[post("/login")]
 pub async fn login(
     body: web::Json<LoginRequest>,
@@ -47,7 +57,7 @@ pub async fn login(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct RegisterRequest {
     pub mail: String,
     pub name: String,
@@ -55,6 +65,18 @@ pub struct RegisterRequest {
     pub role: Role,
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/register",
+    request_body = RegisterRequest,
+    responses(
+        (status = 200, description = "Successfully registered", content_type = "application/json", body = AuthResponse),
+        (status = 400, description = "Invalid role or request data"),
+        (status = 401, description = "Invalid email or password"),
+        (status = 409, description = "Email already in use"),
+        (status = 500, description = "Internal server error")
+    )
+)]
 #[post("/register")]
 pub async fn register(
     body: web::Json<RegisterRequest>,
