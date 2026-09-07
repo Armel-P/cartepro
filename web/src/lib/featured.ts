@@ -1,5 +1,5 @@
-const HISTORY_KEY = "tickettout.featuredHistory"
-const CLICKS_KEY = "tickettout.featuredClicks"
+const HISTORY_KEY = "cartepro.featuredHistory"
+const CLICKS_KEY = "cartepro.featuredClicks"
 
 export type FeaturedEntry = {
   id: string

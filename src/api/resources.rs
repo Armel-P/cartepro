@@ -43,11 +43,13 @@ impl CrudAdapter<employee::Entity> for EmployeeAdapter {
 pub struct CreatePartnerDto {
     pub id: Uuid,
     pub siren: Option<i32>,
+    pub social_obj: Option<String>,
     pub category: Option<String>,
 }
 
 #[derive(Deserialize)]
 pub struct UpdatePartnerDto {
+    pub social_obj: Option<String>,
     pub highlight: Option<bool>,
     pub verification: Option<bool>,
 }
@@ -62,6 +64,7 @@ impl CrudAdapter<partner::Entity> for PartnerAdapter {
         partner::ActiveModel {
             id: ActiveValue::Set(dto.id),
             siren: ActiveValue::Set(dto.siren),
+            social_obj: ActiveValue::Set(dto.social_obj),
             category: ActiveValue::Set(dto.category),
             ..Default::default()
         }
@@ -69,6 +72,9 @@ impl CrudAdapter<partner::Entity> for PartnerAdapter {
 
     fn apply_update(dto: Self::UpdateDto, model: partner::Model) -> partner::ActiveModel {
         let mut am = model.into_active_model();
+        if let Some(s) = dto.social_obj {
+            am.social_obj = ActiveValue::Set(Some(s));
+        }
         if let Some(h) = dto.highlight {
             am.highlight = ActiveValue::Set(Some(h));
         }

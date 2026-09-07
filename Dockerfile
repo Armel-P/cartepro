@@ -31,8 +31,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder \
-  /app/target/release/tickettout \
-  /usr/local/bin/tickettout
+  /app/target/release/cartepro \
+  /usr/local/bin/cartepro
 
 COPY --from=frontend \
   /app/web/dist \
@@ -42,4 +42,4 @@ ENV RUST_LOG=info
 
 EXPOSE 8080
 
-CMD ["tickettout"]
+CMD ["cartepro"]

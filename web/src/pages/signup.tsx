@@ -1,4 +1,5 @@
 import { SignupForm } from "../components/signup-form"
+import { Footer } from "../components/Footer"
 
 export default function SignupPage() {
   return (
@@ -7,7 +8,8 @@ export default function SignupPage() {
         <div className="w-full max-w-sm md:max-w-4xl">
           <SignupForm />
         </div>
-        </div>
+      </div>
+      <Footer />
     </div>
   )
 }

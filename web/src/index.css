@@ -4,53 +4,30 @@
 @import "@fontsource/spectral/500.css";
 @import "@fontsource/spectral/600.css";
 @import "@fontsource/spectral/700.css";
+@import "@fontsource-variable/geist/index.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@font-face {
-  font-family: "Marianne";
-  src: url("./assets/fonts/marianne/Marianne-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Marianne";
-  src: url("./assets/fonts/marianne/Marianne-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Marianne";
-  src: url("./assets/fonts/marianne/Marianne-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
-  --c-bleu-principal: #1b3a6b; 
-  --c-bleu-fonce: #0e1f3b;
-  --c-blanc: #ffffff; 
+  --c-blanc: #ffffff;
   --c-gris-clair: #f4f6f9;
   --c-accent-1: #b4530f;
   --c-accent-1-vif: #d96b27;
   --c-accent-2: #008060;
 
   --background: 0 0% 100%;
-  --foreground: 217 62% 14%;
+  --foreground: 0 0% 14%;
   --card: 0 0% 100%;
-  --card-foreground: 217 62% 14%;
+  --card-foreground: 0 0% 14%;
   --popover: 0 0% 100%;
-  --popover-foreground: 217 62% 14%;
-  --primary: 217 60% 26%;
+  --popover-foreground: 0 0% 14%;
+  --primary: 350 55% 32%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 216 29% 97%; 
-  --secondary-foreground: 217 62% 14%;
-  --muted: 216 29% 97%; 
-  --muted-foreground: 217 20% 42%;
-  --accent-foreground: 217 62% 14%;
+  --secondary: 0 0% 97%;
+  --secondary-foreground: 0 0% 14%;
+  --muted: 0 0% 97%; 
+  --muted-foreground: 0 0% 42%;
+  --accent-foreground: 0 0% 14%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
   --positive: 165 100% 25%;
@@ -60,9 +37,9 @@
   --brand-accent: 25 85% 38%; 
   --brand-accent-foreground: 0 0% 100%;
   --brand-accent-strong: 23 70% 50%; 
-  --border: 216 22% 89%; 
-  --input: 216 22% 89%;
-  --ring: 217 60% 26%;
+  --border: 0 0% 89%;
+  --input: 0 0% 89%;
+  --ring: 350 55% 32%;
   --radius: 0.5rem;
 }
 
@@ -73,8 +50,8 @@
   --card-foreground: 0 0% 98%;
   --popover: 240 10% 3.9%;
   --popover-foreground: 0 0% 98%;
-  --primary: 217 55% 60%;
-  --primary-foreground: 217 60% 12%;
+  --primary: 350 60% 68%;
+  --primary-foreground: 350 55% 12%;
   --secondary: 240 3.7% 15.9%;
   --secondary-foreground: 0 0% 98%;
   --muted: 240 3.7% 15.9%;
@@ -89,7 +66,7 @@
   --negative-foreground: 0 91% 10%;
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
-  --ring: 217 55% 60%;
+  --ring: 350 60% 68%;
 }
 
 @theme inline {
@@ -120,8 +97,6 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  --color-c-bleu-principal: var(--c-bleu-principal);
-  --color-c-bleu-fonce: var(--c-bleu-fonce);
   --color-c-blanc: var(--c-blanc);
   --color-c-gris-clair: var(--c-gris-clair);
   --color-c-accent-1: var(--c-accent-1);
@@ -132,7 +107,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  --font-heading: "Marianne", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Spectral", ui-serif, Georgia, serif;
 }
 

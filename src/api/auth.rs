@@ -1,6 +1,11 @@
+use actix_web::{HttpResponse, Responder, post, web};
+use sea_orm::{ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, TransactionTrait};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
 use crate::{
     db::{get_one, insert},
-    entities::user::{self as User},
+    entities::{employee, partner, user::{self as User}},
     models::Role,
 };
 use utoipa::{self, ToSchema};
@@ -63,6 +68,8 @@ pub struct RegisterRequest {
     pub name: String,
     pub password: String,
     pub role: Role,
+    pub siren: Option<i32>,
+    pub social_object: Option<String>,
 }
 
 #[utoipa::path(
@@ -109,15 +116,56 @@ pub async fn register(
 
     let entity = User::ActiveModel::from(User::Model::from(user));
 
-    match insert::<User::Entity, _>(db.get_ref(), entity).await {
-        Ok(user) => HttpResponse::Ok().json(AuthResponse {
-            id: user.id,
-            mail: user.mail,
-            name: user.name,
-            role: user.role.into(),
-        }),
-        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    let txn = match db.get_ref().begin().await {
+        Ok(txn) => txn,
+        Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
+    };
+
+    let inserted_user = match insert::<User::Entity, _>(&txn, entity).await {
+        Ok(user) => user,
+        Err(e) => {
+            let _ = txn.rollback().await;
+            return HttpResponse::InternalServerError().body(e.to_string());
+        }
+    };
+
+    let role_record = match role {
+        Role::Manant => {
+            let model = employee::ActiveModel {
+                id: ActiveValue::Set(inserted_user.id),
+                balance: ActiveValue::Set(Some(0.0)),
+                ..Default::default()
+            };
+            insert::<employee::Entity, _>(&txn, model).await.map(|_| ())
+        }
+        Role::Partner => {
+            let model = partner::ActiveModel {
+                id: ActiveValue::Set(inserted_user.id),
+                siren: ActiveValue::Set(body.siren),
+                social_obj: ActiveValue::Set(body.social_object.clone()),
+                verification: ActiveValue::Set(Some(false)),
+                ..Default::default()
+            };
+            insert::<partner::Entity, _>(&txn, model).await.map(|_| ())
+        }
+        Role::Admin => unreachable!("Admin role is rejected above"),
+    };
+
+    if let Err(e) = role_record {
+        let _ = txn.rollback().await;
+        return HttpResponse::InternalServerError().body(e.to_string());
     }
+
+    if let Err(e) = txn.commit().await {
+        return HttpResponse::InternalServerError().body(e.to_string());
+    }
+
+    HttpResponse::Ok().json(AuthResponse {
+        id: inserted_user.id,
+        mail: inserted_user.mail,
+        name: inserted_user.name,
+        role: inserted_user.role.into(),
+    })
 }
 
 pub fn configure(cfg: &mut web::ServiceConfig) {

@@ -1,5 +1,5 @@
 --
--- TicketTout database seed
+-- CartePro database seed
 --
 
 --

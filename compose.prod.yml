@@ -3,12 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: tickettout
+    container_name: cartepro
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: postgres://tickettout:${POSTGRES_PASSWORD}@postgres:5432/tickettout
+      DATABASE_URL: postgres://cartepro:${POSTGRES_PASSWORD}@postgres:5432/cartepro
       RUST_LOG: info
     depends_on:
       postgres:
@@ -16,17 +16,17 @@ services:
 
   postgres:
     image: postgres:18
-    container_name: tickettout-postgres
+    container_name: cartepro-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: tickettout
+      POSTGRES_USER: cartepro
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: tickettout
+      POSTGRES_DB: cartepro
     volumes:
       - postgres_prod_data:/var/lib/postgresql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U tickettout -d tickettout"]
+      test: ["CMD-SHELL", "pg_isready -U cartepro -d cartepro"]
       interval: 5s
       timeout: 5s
       retries: 10

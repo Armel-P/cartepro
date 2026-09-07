@@ -8,17 +8,25 @@ import PartnerPaymentPage from "./pages/PartnerPages/payment"
 import PartnerScanPage from "./pages/PartnerPages/scan"
 import AdminPartnerValidationPage from "./pages/AdminPages/partnerValidation"
 import AdminPartnerHighlightPage from "./pages/AdminPages/partnerHighlight"
+import AdminUserListPage from "./pages/AdminPages/userList"
 import EmployeePaymentPage from "./pages/EmployeePages/payment"
 import EmployeeBalancePage from "./pages/EmployeePages/ballance"
 import EmployeePartnersPage from "./pages/EmployeePages/partners"
 import EmployeeSettingsPage from "./pages/EmployeePages/settings"
+import NotFoundPage from "./pages/NotFound"
 import { Header } from "./components/Header"
+import { Footer } from "./components/Footer"
 
 function RequireAuth({ children }: { children: ReactNode }) {
   if (!isLoggedIn()) {
     return <Navigate to="/login" replace />
   }
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      <Footer />
+    </>
+  )
 }
 
 export default function App() {
@@ -60,7 +68,11 @@ export default function App() {
           path="/AdminPages/partnerHighlight"
           element={<RequireAuth><Header /><AdminPartnerHighlightPage /></RequireAuth>}
         />
-        <Route path="*" element={<><Navigate to="/" replace /></>} />
+        <Route
+          path="/AdminPages/userList"
+          element={<RequireAuth><Header /><AdminUserListPage /></RequireAuth>}
+        />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   )

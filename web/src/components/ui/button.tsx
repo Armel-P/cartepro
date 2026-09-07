@@ -7,10 +7,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Bleu institutionnel jamais en fond de bouton : le CTA principal
-        // utilise un remplissage neutre, le bleu ne sert qu'en accent
-        // (bordure, texte, focus, liens — voir variant "outline" et "link").
-        default: "bg-foreground text-background hover:bg-foreground/85",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
         outline:
           "border-primary/40 bg-background text-primary hover:bg-primary/5 hover:border-primary/60 aria-expanded:bg-primary/5 dark:border-primary/50 dark:hover:bg-primary/10",
         secondary:

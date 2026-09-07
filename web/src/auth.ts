@@ -5,7 +5,7 @@ export type AuthUser = {
   role?: string
 }
 
-const STORAGE_KEY = "tickettout.user"
+const STORAGE_KEY = "cartepro.user"
 
 export function getUser(): AuthUser | null {
   try {

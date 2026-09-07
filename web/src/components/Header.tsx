@@ -23,12 +23,11 @@ export function Header() {
     <header className="border-b bg-background">
       <div className="flex h-20 w-full items-center px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
-          <a className="block shrink-0 p-2" href="/">
-            <img
-              src="/public/favicon.png"
-              alt="Ticket Tout"
-              className="h-15 w-15"
-            />
+          <a
+            className="block shrink-0 px-2 py-2 font-heading text-2xl font-semibold text-primary"
+            href="/"
+          >
+            CartePro
           </a>
           <nav
             aria-label="Global"
