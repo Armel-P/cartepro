@@ -12,8 +12,6 @@ pub struct Model {
     #[sea_orm(unique, nullable)]
     pub siren: Option<i32>,
     pub social_obj: Option<String>,
-    pub highlight: Option<bool>,
-    pub highlight_text: Option<String>,
     pub verification: Option<bool>,
     pub category: Option<String>,
 }

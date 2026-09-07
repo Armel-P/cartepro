@@ -7,7 +7,6 @@ import Signup from "./pages/signup"
 import PartnerPaymentPage from "./pages/PartnerPages/payment"
 import PartnerScanPage from "./pages/PartnerPages/scan"
 import AdminPartnerValidationPage from "./pages/AdminPages/partnerValidation"
-import AdminPartnerHighlightPage from "./pages/AdminPages/partnerHighlight"
 import AdminUserListPage from "./pages/AdminPages/userList"
 import EmployeePaymentPage from "./pages/EmployeePages/payment"
 import EmployeeBalancePage from "./pages/EmployeePages/ballance"
@@ -63,10 +62,6 @@ export default function App() {
         <Route
           path="/AdminPages/partnerValidation"
           element={<RequireAuth><Header /><AdminPartnerValidationPage /></RequireAuth>}
-        />
-        <Route
-          path="/AdminPages/partnerHighlight"
-          element={<RequireAuth><Header /><AdminPartnerHighlightPage /></RequireAuth>}
         />
         <Route
           path="/AdminPages/userList"

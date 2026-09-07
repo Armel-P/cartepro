@@ -16,7 +16,7 @@ echo -e "\n-> GET /health"
 curl -s -X GET "$BASE_URL/health" | jq .
 
 echo -e "\n-> POST /echo"
-curl -s -X POST "$BASE_URL/echo" -H "Content-Type: text/plain" -d "Hello Tickettout!"
+curl -s -X POST "$BASE_URL/echo" -H "Content-Type: text/plain" -d "Hello Cartepro!"
 echo ""
 
 RANDOM_MAIL="test_$(date +%s)@example.com"
