@@ -3,9 +3,19 @@ export type AuthUser = {
   mail: string
   name: string
   role?: string
+  created_at?: bigint
 }
 
 const STORAGE_KEY = "cartepro.user"
+
+export function getToken(): string | null {
+  try {
+    return getUser()?.id ?? null;
+  } catch {
+      console.error("error getting token");
+    return null
+  }
+}
 
 export function getUser(): AuthUser | null {
   try {

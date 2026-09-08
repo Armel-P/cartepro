@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { buttonVariants } from "../components/ui/button"
 import { Watermark } from "../components/Watermark"
 import { Footer } from "../components/Footer"
+import "../assets/css/global.css"
 
 const features = [
   {
@@ -21,54 +22,31 @@ const features = [
 export default function HomePage() {
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-background">
-      <header className="sticky top-0 z-10 shrink-0 border-b border-border bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-          <Link
-            to="/"
-            className="font-heading text-lg font-semibold text-primary"
-          >
-            CartePro
-          </Link>
-          <nav className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className={buttonVariants({
-                variant: "ghost",
-                size: "sm",
-                className: "text-primary hover:text-primary!",
-              })}
-            >
-              Se connecter
-            </Link>
-            <Link
-              to="/signup"
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              Créer un compte
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       <Watermark
         text="SIMULATION — SITE DE DÉMONSTRATION"
         className="min-h-0 flex-1"
       >
         <section className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 overflow-hidden px-6 py-8 md:grid-cols-2">
           <div className="flex flex-col gap-6">
-            <span className="text-sm font-semibold uppercase tracking-wide text-brand-accent">
+            <span className="text-sm font-semibold uppercase tracking-wide text-brand-accent ">
               Avantages salariés dématérialisés
             </span>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
-              Votre CartePro,
+              <span className="font-heading text-6xl font-semibold text-primary animate-card-in"
+                    style={{ animationDelay: `${50}ms`,}}
+              >
+                Votre CartePro,
+              </span>
               <br />
-              partout, à tout moment.
+              <span className="animate-card-in" style={{ animationDelay: `${150}ms`,}}>
+                partout, à tout moment.
+              </span>
             </h1>
-            <p className="max-w-md text-lg text-muted-foreground">
+            <p className="max-w-md text-lg text-muted-foreground animate-card-in" style={{ animationDelay: `${250}ms`,}}>
               Consultez votre solde, payez chez nos partenaires par QR code et
               suivez vos transactions — le tout depuis une seule application.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row animate-card-in" style={{ animationDelay: `${350}ms`,}}>
               <Link to="/login" className={buttonVariants({ size: "lg" })}>
                 Se connecter
               </Link>
@@ -81,7 +59,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md">
+          <div className="relative mx-auto w-full max-w-md animate-card-in" style={{ animationDelay: `${450}ms`,}}>
             <img
               src="/public/carte_cartepro.png"
               alt="Carte CartePro"
@@ -92,6 +70,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        <Footer />
         <section className="shrink-0 border-t border-border bg-c-gris-clair">
           <div className="mx-auto grid w-full max-w-6xl gap-6 px-6 py-6 sm:grid-cols-3">
             {features.map((feature) => (
@@ -107,7 +86,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        <Footer />
       </Watermark>
     </div>
   )
