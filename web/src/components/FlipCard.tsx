@@ -75,7 +75,7 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
                 src="/public/cartepro.png"
                 alt="CartePro"
                 className="
-                  h-[clamp(18px,5vw,40px)]
+                  h-[clamp(20px,5vw,60px)]
                   w-auto
                   object-contain
                 "
@@ -165,7 +165,7 @@ export default function BankCard({ paymentUrl }: BankCardProps) {
                     text-[clamp(11px,3vw,16px)]
                   "
                 >
-                  JJ / MM / AAAA
+                  {String(user?.created_at) ?? "JJ / MM / AAAA"}
                 </p>
               </div>
             </div>

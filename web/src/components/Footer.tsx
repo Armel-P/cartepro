@@ -1,10 +1,11 @@
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background py-4">
-      <p className="mx-auto max-w-6xl px-6 text-center text-xs text-muted-foreground">
-        Démonstrateur technique, ne constitue pas un service public en
-        exploitation.
-      </p>
+    <footer className="h-20 w-full shrink-0 overflow-hidden">
+      <div className="mx-auto flex h-full max-w-6xl items-center justify-center px-6">
+        <span className="text-lg">
+          Démonstrateur technique, ne constitue pas un service public en exploitation.
+        </span>
+      </div>
     </footer>
   )
 }

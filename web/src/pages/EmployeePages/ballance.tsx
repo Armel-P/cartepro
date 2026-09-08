@@ -55,6 +55,7 @@ const PLACEHOLDER_TRANSACTIONS: Transaction[] = [
   { id: "3", label: "Déjeuner — Sushi Corner", date: "27 août 2026", amount: "-15,90 €", direction: "debit" },
   { id: "4", label: "Déjeuner — Boulangerie Martin", date: "26 août 2026", amount: "-6,40 €", direction: "debit" },
   { id: "5", label: "Rechargement du compte", date: "21 août 2026", amount: "+50,00 €", direction: "credit" },
+  { id: "6", label: "Rechargement du compte", date: "25 août 2026", amount: "+10,00 €", direction: "credit" },
 ]
 
 export default function BalancePage() {
@@ -134,7 +135,7 @@ export default function BalancePage() {
             <CardDescription>Vos derniers mouvements de compte</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="flex flex-col">
+            <ul className="flex flex-col scroll-auto scrollbar-none gap-2 overflow-y-auto max-h-100">
               {PLACEHOLDER_TRANSACTIONS.map((transaction, index) => (
                 <li key={transaction.id}>
                   <div className="flex items-center justify-between gap-4 py-3">
