@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { cn } from "../lib/utils"
 import { api, ApiError } from "../api"
 import { hashPassword } from "../lib/hash"
-import { setUser, type AuthUser } from "../auth"
+import { setUser, getHomeRoute, type AuthUser } from "../auth"
 import { Button } from "../components/ui/button"
 import {
   Card,
@@ -20,8 +20,6 @@ import {
   FieldLabel,
 } from "../components/ui/field"
 import { Input } from "../components/ui/input"
-
-const AFTER_LOGIN_ROUTE = "/EmployeePages/balance"
 
 export function LoginForm({
   className,
@@ -46,7 +44,7 @@ export function LoginForm({
       })
 
       setUser(user)
-      navigate(AFTER_LOGIN_ROUTE, { replace: true })
+      navigate(getHomeRoute(user.role), { replace: true })
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError("E-mail ou mot de passe incorrect.")

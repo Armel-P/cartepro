@@ -8,6 +8,8 @@ import PartnerScanPage from "./pages/PartnerPages/scan"
 import PartnerDashboardPage from "./pages/PartnerPages/dashboard"
 import AdminPartnerValidationPage from "./pages/AdminPages/partnerValidation"
 import AdminUserListPage from "./pages/AdminPages/userList"
+import AdminEnterprisePaymentPage from "./pages/AdminPages/enterprisePayment"
+import AdminDashboardPage from "./pages/AdminPages/dashboard"
 import EmployeePaymentPage from "./pages/EmployeePages/payment"
 import EmployeeBalancePage from "./pages/EmployeePages/ballance"
 import EmployeePartnersPage from "./pages/EmployeePages/partners"
@@ -70,6 +72,14 @@ export default function App() {
         <Route
           path="/AdminPages/userList"
           element={<RequireAuth><Header /><AdminUserListPage /></RequireAuth>}
+        />
+        <Route
+          path="/AdminPages/enterprisePayment"
+          element={<RequireAuth><Header /><AdminEnterprisePaymentPage /></RequireAuth>}
+        />
+        <Route
+          path="/AdminPages/dashboard"
+          element={<RequireAuth><Header /><AdminDashboardPage /></RequireAuth>}
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

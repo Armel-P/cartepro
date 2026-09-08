@@ -46,3 +46,15 @@ export function clearUser(): void {
 export function isLoggedIn(): boolean {
   return getUser() !== null
 }
+
+const HOME_ROUTE_BY_ROLE: Record<string, string> = {
+  Manant: "/EmployeePages/balance",
+  Partner: "/PartnerPages/dashboard",
+  Admin: "/AdminPages/dashboard",
+}
+
+const DEFAULT_HOME_ROUTE = "/EmployeePages/balance"
+
+export function getHomeRoute(role?: string): string {
+  return (role && HOME_ROUTE_BY_ROLE[role]) || DEFAULT_HOME_ROUTE
+}

@@ -24,8 +24,10 @@ const NAV_LINKS_BY_ROLE: Record<string, NavLink[]> = {
     { href: "/PartnerPages/partners", label: "Partenaires" },
   ],
   Admin: [
+    { href: "/AdminPages/dashboard", label: "Tableau de bord" },
     { href: "/AdminPages/partnerValidation", label: "Validation partenaires" },
     { href: "/AdminPages/userList", label: "Gestion des comptes" },
+    { href: "/AdminPages/enterprisePayment", label: "Abondements" },
   ],
 };
 

@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom"
-import { isLoggedIn } from "../auth"
+import { getUser, isLoggedIn, getHomeRoute } from "../auth"
 import { LoginForm } from "../components/login-form"
 import { Footer } from "../components/Footer"
 
 export default function LoginPage() {
   if (isLoggedIn()) {
-    return <Navigate to="/EmployeePages/balance" replace />
+    return <Navigate to={getHomeRoute(getUser()?.role)} replace />
   }
 
   return (
