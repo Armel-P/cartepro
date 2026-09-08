@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, Responder, get, post, web};
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
     QuerySelect, RelationTrait, TransactionTrait,
-    sea_query::{Expr, ExprTrait},
+    sea_query::{ExprTrait},
 };
 use serde::Deserialize;
 use uuid::Uuid;
@@ -26,32 +26,32 @@ pub async fn get_pending_partners(db: web::Data<DatabaseConnection>) -> impl Res
     }
 }
 
-#[post("/partners/{id}/click")]
-pub async fn track_partner_click(
-    db: web::Data<DatabaseConnection>,
-    id: web::Path<Uuid>,
-) -> impl Responder {
-    let partner_id = id.into_inner();
+// #[post("/partners/{id}/click")]
+// pub async fn track_partner_click(
+//     db: web::Data<DatabaseConnection>,
+//     id: web::Path<Uuid>,
+// ) -> impl Responder {
+//     let partner_id = id.into_inner();
 
-    let res = partner::Entity::update_many()
-        .col_expr(
-            partner::Column::Clicks,
-            Expr::col(partner::Column::Clicks).add(1),
-        )
-        .filter(partner::Column::Id.eq(partner_id))
-        .exec(db.get_ref())
-        .await;
+//     let res = partner::Entity::update_many()
+//         .col_expr(
+//             partner::Column::Clicks,
+//             Expr::col(partner::Column::Clicks).add(1),
+//         )
+//         .filter(partner::Column::Id.eq(partner_id))
+//         .exec(db.get_ref())
+//         .await;
 
-    match res {
-        Ok(result) if result.rows_affected > 0 => {
-            HttpResponse::Ok().json(serde_json::json!({ "success": true }))
-        }
-        Ok(_) => HttpResponse::NotFound().json(serde_json::json!({ "error": "Partner not found" })),
-        Err(e) => {
-            HttpResponse::InternalServerError().json(serde_json::json!({ "error": e.to_string() }))
-        }
-    }
-}
+//     match res {
+//         Ok(result) if result.rows_affected > 0 => {
+//             HttpResponse::Ok().json(serde_json::json!({ "success": true }))
+//         }
+//         Ok(_) => HttpResponse::NotFound().json(serde_json::json!({ "error": "Partner not found" })),
+//         Err(e) => {
+//             HttpResponse::InternalServerError().json(serde_json::json!({ "error": e.to_string() }))
+//         }
+//     }
+// }
 
 #[derive(Deserialize)]
 pub struct PaymentRequest {

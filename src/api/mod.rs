@@ -26,7 +26,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .service(csv::transactions_to_csv)
             .configure(user::configure)
             .service(business::get_pending_partners)
-            .service(business::track_partner_click)
+            // .service(business::track_partner_click)
             .service(business::process_payment)
             .service(business::get_employee_transactions)
             .service(business::get_partner_transactions)

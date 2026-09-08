@@ -28,7 +28,6 @@ CREATE TABLE partner (
   social_obj VARCHAR(255),
   verification BOOL,
   category VARCHAR(255),
-  clicks INT4 NOT NULL DEFAULT 0
 );
 
 CREATE TABLE admin (
