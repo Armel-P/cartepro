@@ -7,7 +7,7 @@
 --
 -- 1. users table
 INSERT INTO users (id, mail, name, password, role, created_at) VALUES
-('11111111-1111-1111-1111-000000000001', 'anais.durand1@outlook.fr', 'Anais Durand', '$2b$12$5c3veGprQFnIiU74KKEpYEZAmggQBwBAD3UdRPPgdzUvZ3gpmmICi', 'manant', 1772182800),
+('11111111-1111-1111-1111-000000000001', 'anais.durand1@outlook.fr', 'Anais Durand', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', 'manant', 1772182800),
 ('11111111-1111-1111-1111-000000000002', 'julien.morel2@outlook.fr', 'Julien Morel', '$2b$12$Dp37eCZ32JgdPI1af7W2pkAFEn3z5dkyayq7YYDsBS9UYJQTFjmsn', 'manant', 1753520400),
 ('11111111-1111-1111-1111-000000000003', 'baptiste.bertrand3@laposte.net', 'Baptiste Bertrand', '$2b$12$dVuddLEG62Hkd9Gf2leMeR3pzh84KpLMcNfAQLKHu7qnQTupqziQP', 'manant', 1730192400),
 ('11111111-1111-1111-1111-000000000004', 'laura.moreau4@free.fr', 'Laura Moreau', '$2b$12$7W7eaDNKgeInGqi7w4e4pxskC1ITtNZPHaQ0Jt7Qg84iqh4gVJjrs', 'manant', 1750237200),
