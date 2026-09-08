@@ -1,26 +1,30 @@
 use actix_web::{HttpResponse, Responder, get, post, web};
 use sea_orm::{
-    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
-    QuerySelect, RelationTrait, TransactionTrait,
-    sea_query::{ExprTrait},
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, FromQueryResult,
+    QueryFilter, QuerySelect, RelationTrait, TransactionTrait,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::entities::{employee, partner, state, transaction, user};
 
-#[derive(ToSchema)]
-pub struct ErrorResponse {
-    pub error: String,
+#[derive(Serialize, ToSchema, FromQueryResult)]
+pub struct PendingPartner {
+    pub id: Uuid,
+    pub name: String,
+    pub mail: String,
+    pub siren: Option<i32>,
+    pub social_obj: Option<String>,
+    pub requested_at: i64,
 }
 
 #[utoipa::path(
     get,
     path = "/api/admin/partners/pending",
     responses(
-        (status = 200, description = "Successfully retrieved pending partners", content_type = "application/json", body = [partner::Model]),
-        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
+        (status = 200, description = "Partners waiting for admin validation", content_type = "application/json", body = [PendingPartner]),
+        (status = 500, description = "Internal server error")
     )
 )]
 #[get("/admin/partners/pending")]
@@ -29,6 +33,14 @@ pub async fn get_pending_partners(db: web::Data<DatabaseConnection>) -> impl Res
         .join(sea_orm::JoinType::InnerJoin, partner::Relation::User.def())
         .join(sea_orm::JoinType::InnerJoin, user::Relation::State.def())
         .filter(state::Column::State.eq("waiting_activation"))
+        .select_only()
+        .column(partner::Column::Id)
+        .column_as(user::Column::Name, "name")
+        .column_as(user::Column::Mail, "mail")
+        .column(partner::Column::Siren)
+        .column(partner::Column::SocialObj)
+        .column_as(state::Column::ModifiedAt, "requested_at")
+        .into_model::<PendingPartner>()
         .all(db.get_ref())
         .await;
 
@@ -40,32 +52,46 @@ pub async fn get_pending_partners(db: web::Data<DatabaseConnection>) -> impl Res
     }
 }
 
-// #[post("/partners/{id}/click")]
-// pub async fn track_partner_click(
-//     db: web::Data<DatabaseConnection>,
-//     id: web::Path<Uuid>,
-// ) -> impl Responder {
-//     let partner_id = id.into_inner();
+#[derive(Serialize, ToSchema, FromQueryResult)]
+pub struct UserSummary {
+    pub id: Uuid,
+    pub name: String,
+    pub mail: String,
+    pub role: user::Role,
+    pub state: Option<String>,
+    pub created_at: i64,
+}
 
-//     let res = partner::Entity::update_many()
-//         .col_expr(
-//             partner::Column::Clicks,
-//             Expr::col(partner::Column::Clicks).add(1),
-//         )
-//         .filter(partner::Column::Id.eq(partner_id))
-//         .exec(db.get_ref())
-//         .await;
+#[utoipa::path(
+    get,
+    path = "/api/admin/users",
+    responses(
+        (status = 200, description = "All user accounts with their current state", content_type = "application/json", body = [UserSummary]),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[get("/admin/users")]
+pub async fn get_users(db: web::Data<DatabaseConnection>) -> impl Responder {
+    let users = user::Entity::find()
+        .join(sea_orm::JoinType::LeftJoin, user::Relation::State.def())
+        .select_only()
+        .column(user::Column::Id)
+        .column(user::Column::Name)
+        .column(user::Column::Mail)
+        .column(user::Column::Role)
+        .column(user::Column::CreatedAt)
+        .column_as(state::Column::State, "state")
+        .into_model::<UserSummary>()
+        .all(db.get_ref())
+        .await;
 
-//     match res {
-//         Ok(result) if result.rows_affected > 0 => {
-//             HttpResponse::Ok().json(serde_json::json!({ "success": true }))
-//         }
-//         Ok(_) => HttpResponse::NotFound().json(serde_json::json!({ "error": "Partner not found" })),
-//         Err(e) => {
-//             HttpResponse::InternalServerError().json(serde_json::json!({ "error": e.to_string() }))
-//         }
-//     }
-// }
+    match users {
+        Ok(users) => HttpResponse::Ok().json(users),
+        Err(e) => {
+            HttpResponse::InternalServerError().json(serde_json::json!({ "error": e.to_string() }))
+        }
+    }
+}
 
 #[derive(Deserialize, ToSchema)]
 pub struct PaymentRequest {

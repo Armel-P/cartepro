@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Card,
   CardContent,
@@ -9,6 +9,16 @@ import {
 import { Button } from "../../components/ui/button"
 import { Separator } from "../../components/ui/separator"
 import { Watermark } from "../../components/Watermark"
+import { api } from "../../api"
+
+type PendingPartnerApi = {
+  id: string
+  name: string
+  mail: string
+  siren: number | null
+  social_obj: string | null
+  requested_at: number
+}
 
 type PendingPartner = {
   id: string
@@ -27,32 +37,13 @@ type Decision = {
   at: string
 }
 
-const PLACEHOLDER_PENDING: PendingPartner[] = [
-  {
-    id: "1",
-    company: "Boulangerie Martin",
-    siren: "552100554",
-    socialObject: "Boulangerie-pâtisserie artisanale",
-    mail: "contact@boulangerie-martin.fr",
-    requestedAt: "2 septembre 2026",
-  },
-  {
-    id: "2",
-    company: "Sushi Corner SARL",
-    siren: "843201967",
-    socialObject: "Restauration japonaise sur place et à emporter",
-    mail: "gerant@sushicorner.fr",
-    requestedAt: "3 septembre 2026",
-  },
-  {
-    id: "3",
-    company: "Presse du Centre",
-    siren: "409824512",
-    socialObject: "Vente de presse, papeterie et articles de bureau",
-    mail: "presse.ducentre@orange.fr",
-    requestedAt: "3 septembre 2026",
-  },
-]
+function formatDate(value: number): string {
+  return new Date(value * 1000).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+}
 
 function nowLabel(): string {
   return new Date().toLocaleDateString("fr-FR", {
@@ -63,11 +54,43 @@ function nowLabel(): string {
 }
 
 export default function AdminPartnerValidationPage() {
-  const [pending, setPending] = useState<PendingPartner[]>(PLACEHOLDER_PENDING)
+  const [pending, setPending] = useState<PendingPartner[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [decisions, setDecisions] = useState<Decision[]>([])
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [comment, setComment] = useState("")
   const [commentError, setCommentError] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    api<PendingPartnerApi[]>("/admin/partners/pending")
+      .then((partners) => {
+        if (cancelled) return
+        setPending(
+          partners.map((p) => ({
+            id: p.id,
+            company: p.name,
+            siren: p.siren?.toString() ?? "—",
+            socialObject: p.social_obj ?? "—",
+            mail: p.mail,
+            requestedAt: formatDate(p.requested_at),
+          })),
+        )
+        setError(null)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setError("Impossible de récupérer les demandes en attente.")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const sortedDecisions = useMemo(
     () => [...decisions].reverse(),
@@ -114,22 +137,32 @@ export default function AdminPartnerValidationPage() {
   }
 
   return (
-    <Watermark text="SIMULATION VALIDATION PARTENAIRES">
+    <Watermark text="DEMANDES RÉELLES — DÉCISIONS NON PERSISTÉES">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <div>
           <h1 className="text-2xl font-semibold">
             Validation des demandes partenaires
           </h1>
           <p className="text-sm text-muted-foreground">
-            {pending.length === 0
-              ? "Aucune demande en attente."
-              : `${pending.length} demande${
-                  pending.length > 1 ? "s" : ""
-                } en attente de validation.`}
+            {loading
+              ? "Chargement…"
+              : pending.length === 0
+                ? "Aucune demande en attente."
+                : `${pending.length} demande${
+                    pending.length > 1 ? "s" : ""
+                  } en attente de validation.`}
           </p>
         </div>
 
-        {pending.length === 0 ? (
+        {error && (
+          <Card>
+            <CardContent className="py-8 text-center text-sm text-destructive">
+              {error}
+            </CardContent>
+          </Card>
+        )}
+
+        {!loading && !error && pending.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-sm text-muted-foreground">
               Toutes les demandes ont été traitées.
