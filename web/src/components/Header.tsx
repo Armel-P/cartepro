@@ -10,9 +10,33 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 
+type NavLink = { href: string; label: string };
+
+const NAV_LINKS_BY_ROLE: Record<string, NavLink[]> = {
+  Manant: [
+    { href: "/EmployeePages/balance", label: "Porte-monnaie" },
+    { href: "/EmployeePages/payment", label: "Transaction" },
+    { href: "/EmployeePages/partners", label: "Partenaires" },
+  ],
+  Partner: [
+    { href: "/PartnerPages/scan", label: "Encaisser" },
+    { href: "/PartnerPages/dashboard", label: "Tableau de bord" },
+    { href: "/PartnerPages/partners", label: "Partenaires" },
+  ],
+  Admin: [
+    { href: "/AdminPages/dashboard", label: "Tableau de bord" },
+    { href: "/AdminPages/partnerValidation", label: "Validation partenaires" },
+    { href: "/AdminPages/userList", label: "Gestion des comptes" },
+    { href: "/AdminPages/enterprisePayment", label: "Abondements" },
+  ],
+};
+
+const SETTINGS_HREF = "/settings";
+
 export function Header() {
   const navigate = useNavigate();
   const user = getUser();
+  const navLinks = user?.role ? (NAV_LINKS_BY_ROLE[user.role] ?? []) : [];
 
   function handleLogout() {
     clearUser();
@@ -34,32 +58,16 @@ export function Header() {
             className="ml-10 hidden md:block"
           >
             <ul className="flex items-center gap-10 text-xl">
-              <li>
-                <a
-                  className="text-muted-foreground transition hover:text-primary"
-                  href="/EmployeePages/balance"
-                >
-                  Porte-monnaie
-                </a>
-              </li>
-
-              <li>
-                <a
-                  className="text-muted-foreground transition hover:text-primary"
-                  href="/EmployeePages/payment"
-                >
-                  Transaction
-                </a>
-              </li>
-
-              <li>
-                <a
-                  className="text-muted-foreground transition hover:text-primary"
-                  href="/EmployeePages/partners"
-                >
-                  Partenaires
-                </a>
-              </li>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    className="text-muted-foreground transition hover:text-primary"
+                    href={link.href}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
@@ -73,7 +81,7 @@ export function Header() {
               Se déconnecter
             </button>
 
-            <a href="/EmployeePages/settings" className="px-2 py-2.5 text-xl font-medium text-primary">
+            <a href={SETTINGS_HREF} className="px-2 py-2.5 text-xl font-medium text-primary">
               {user?.name ?? "Invité"}
             </a>
           </div>
@@ -99,9 +107,11 @@ export function Header() {
 
               <nav className="ml-4 mt-8 flex flex-col gap-6 text-lg">
                 <a href="/">Accueil</a>
-                <a href="/EmployeePages/balance">Porte-monaie</a>
-                <a href="/EmployeePages/payment">Payment</a>
-                <a href="/EmployeePages/partners">Parteners</a>
+                {navLinks.map((link) => (
+                  <a key={link.href} href={link.href}>
+                    {link.label}
+                  </a>
+                ))}
                 <button
                   onClick={handleLogout}
                   className="text-left text-primary"

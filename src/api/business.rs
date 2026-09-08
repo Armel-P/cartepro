@@ -15,6 +15,43 @@ pub struct ErrorResponse {
 }
 
 #[derive(Serialize, ToSchema, FromQueryResult)]
+pub struct PartnerDirectoryEntry {
+    pub id: Uuid,
+    pub social_obj: Option<String>,
+    pub category: Option<String>,
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/directory",
+    responses(
+        (status = 200, description = "Active partners referenced by the ministry", content_type = "application/json", body = [PartnerDirectoryEntry]),
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
+    )
+)]
+#[get("/directory")]
+pub async fn get_partner_directory(db: web::Data<DatabaseConnection>) -> impl Responder {
+    let partners = partner::Entity::find()
+        .join(sea_orm::JoinType::InnerJoin, partner::Relation::User.def())
+        .join(sea_orm::JoinType::InnerJoin, user::Relation::State.def())
+        .filter(state::Column::State.eq("active"))
+        .select_only()
+        .column(partner::Column::Id)
+        .column(partner::Column::SocialObj)
+        .column(partner::Column::Category)
+        .into_model::<PartnerDirectoryEntry>()
+        .all(db.get_ref())
+        .await;
+
+    match partners {
+        Ok(partners) => HttpResponse::Ok().json(partners),
+        Err(e) => {
+            HttpResponse::InternalServerError().json(serde_json::json!({ "error": e.to_string() }))
+        }
+    }
+}
+
+#[derive(Serialize, ToSchema, FromQueryResult)]
 pub struct PendingPartner {
     pub id: Uuid,
     pub name: String,

@@ -51,12 +51,19 @@ pub async fn login(
 
             match State::Entity::find_by_id(user.id).one(db.get_ref()).await {
                 Ok(Some(state)) if state.state != "active" => {
-                    let message = match state.state.as_str() {
+                    let base_message = match state.state.as_str() {
                         "waiting_activation" => {
                             "Votre compte est en attente de validation par un administrateur."
                         }
                         "suspended" => "Votre compte a été suspendu.",
+                        "rejected" => "Votre demande d'inscription a été refusée.",
                         _ => "Votre compte n'est pas actif.",
+                    };
+                    let message = match (state.state.as_str(), &state.reason) {
+                        ("rejected" | "suspended", Some(reason)) if !reason.is_empty() => {
+                            format!("{base_message} Motif : {reason}")
+                        }
+                        _ => base_message.to_string(),
                     };
                     return HttpResponse::Forbidden().body(message);
                 }

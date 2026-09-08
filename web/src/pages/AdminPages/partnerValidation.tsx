@@ -61,6 +61,8 @@ export default function AdminPartnerValidationPage() {
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [comment, setComment] = useState("")
   const [commentError, setCommentError] = useState(false)
+  const [actingId, setActingId] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -103,41 +105,75 @@ export default function AdminPartnerValidationPage() {
     setCommentError(false)
   }
 
-  function approve(partner: PendingPartner) {
-    setPending((list) => list.filter((p) => p.id !== partner.id))
-    setDecisions((list) => [
-      ...list,
-      {
-        id: partner.id,
-        company: partner.company,
-        decision: "approved",
-        at: nowLabel(),
-      },
-    ])
-    if (rejectingId === partner.id) resetRejection()
+  async function approve(partner: PendingPartner) {
+    setActionError(null)
+    setActingId(partner.id)
+    try {
+      await api(`/states/${partner.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          state: "active",
+          reason: "Validé par l'administrateur",
+        }),
+      })
+      await api(`/partners/${partner.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verification: true }),
+      })
+      setPending((list) => list.filter((p) => p.id !== partner.id))
+      setDecisions((list) => [
+        ...list,
+        {
+          id: partner.id,
+          company: partner.company,
+          decision: "approved",
+          at: nowLabel(),
+        },
+      ])
+      if (rejectingId === partner.id) resetRejection()
+    } catch {
+      setActionError(`Impossible de valider "${partner.company}" pour le moment.`)
+    } finally {
+      setActingId(null)
+    }
   }
 
-  function confirmRejection(partner: PendingPartner) {
+  async function confirmRejection(partner: PendingPartner) {
     if (!comment.trim()) {
       setCommentError(true)
       return
     }
-    setPending((list) => list.filter((p) => p.id !== partner.id))
-    setDecisions((list) => [
-      ...list,
-      {
-        id: partner.id,
-        company: partner.company,
-        decision: "rejected",
-        comment: comment.trim(),
-        at: nowLabel(),
-      },
-    ])
-    resetRejection()
+    setActionError(null)
+    setActingId(partner.id)
+    try {
+      await api(`/states/${partner.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ state: "rejected", reason: comment.trim() }),
+      })
+      setPending((list) => list.filter((p) => p.id !== partner.id))
+      setDecisions((list) => [
+        ...list,
+        {
+          id: partner.id,
+          company: partner.company,
+          decision: "rejected",
+          comment: comment.trim(),
+          at: nowLabel(),
+        },
+      ])
+      resetRejection()
+    } catch {
+      setActionError(`Impossible de refuser "${partner.company}" pour le moment.`)
+    } finally {
+      setActingId(null)
+    }
   }
 
   return (
-    <Watermark text="DEMANDES RÉELLES — DÉCISIONS NON PERSISTÉES">
+    <Watermark text="DEMANDES ET DÉCISIONS RÉELLES">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <div>
           <h1 className="text-2xl font-semibold">
@@ -160,6 +196,10 @@ export default function AdminPartnerValidationPage() {
               {error}
             </CardContent>
           </Card>
+        )}
+
+        {actionError && (
+          <p className="text-sm text-destructive">{actionError}</p>
         )}
 
         {!loading && !error && pending.length === 0 ? (
@@ -219,13 +259,17 @@ export default function AdminPartnerValidationPage() {
                           <Button
                             type="button"
                             variant="destructive"
+                            disabled={actingId === partner.id}
                             onClick={() => confirmRejection(partner)}
                           >
-                            Confirmer le refus
+                            {actingId === partner.id
+                              ? "Refus…"
+                              : "Confirmer le refus"}
                           </Button>
                           <Button
                             type="button"
                             variant="outline"
+                            disabled={actingId === partner.id}
                             onClick={resetRejection}
                           >
                             Annuler
@@ -234,12 +278,17 @@ export default function AdminPartnerValidationPage() {
                       </div>
                     ) : (
                       <div className="flex gap-2">
-                        <Button type="button" onClick={() => approve(partner)}>
-                          Valider
+                        <Button
+                          type="button"
+                          disabled={actingId === partner.id}
+                          onClick={() => approve(partner)}
+                        >
+                          {actingId === partner.id ? "Validation…" : "Valider"}
                         </Button>
                         <Button
                           type="button"
                           variant="outline"
+                          disabled={actingId === partner.id}
                           onClick={() => {
                             setRejectingId(partner.id)
                             setComment("")
@@ -262,7 +311,7 @@ export default function AdminPartnerValidationPage() {
             <CardHeader>
               <CardTitle>Décisions récentes</CardTitle>
               <CardDescription>
-                Traitées pendant cette session (simulation).
+                Traitées pendant cette session.
               </CardDescription>
             </CardHeader>
             <CardContent>
