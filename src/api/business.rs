@@ -9,7 +9,7 @@ use uuid::Uuid;
 
 use crate::entities::{employee, partner, state, transaction, user};
 
-#[derive (ToShema)]
+#[derive (ToSchema)]
 pub struct ErrorResponse {
     pub error: String
 }
