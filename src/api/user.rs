@@ -1,11 +1,12 @@
 use crate::{
     db::{get_one, update, delete_by_id},
-    entities::user::{self as User, Role},
+    entities::{user::{self as User, Role}, employee::{self as Employee},
+               partner::{self as Partner}, admin::{self as Admin}, state::{self as State}},
 };
 use actix_web::{HttpRequest, HttpResponse, Responder, get, patch, post, delete, web};
 use utoipa::{self, ToSchema};
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter,
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -207,13 +208,13 @@ pub async fn put(
 }
 
 #[utoipa::path(
-    patch,
+    delete,
     path = "/api/user/delete",
     params(
         ("Authorization" = String, Header, description = "Bearer token for authentication"),
     ),
     responses(
-        (status = 200, description = "User information updated successfully", content_type = "application/json", body = User::Model),
+        (status = 200, description = "User deleted successfully"),
         (status = 400, description = "Invalid user UUID"),
         (status = 401, description = "Unauthorized"),
         (status = 404, description = "User not found"),
@@ -245,19 +246,35 @@ pub async fn delete(
 
     match get_one(db.get_ref(), query).await {
         Ok(Some(u)) => {
-            delete_by_id::<User::Entity, _>(db.get_ref(), u.id).await;
-            HttpResponse::Ok().finish()
+            let delete_record = match GetResponse::from(u.clone()).role {
+                Role::Manant => delete_by_id::<Employee::Entity, _>(db.get_ref(), u.id).await,
+                Role::Partner => delete_by_id::<Partner::Entity, _>(db.get_ref(), u.id).await,
+                Role::Admin => delete_by_id::<Admin::Entity, _>(db.get_ref(), u.id).await,
+            };
+
+            if let Err(e) = delete_record {
+                return HttpResponse::InternalServerError().body(e.to_string());
+            }
+            if let Err(e) = delete_by_id::<State::Entity, _>(db.get_ref(), u.id).await
+            {
+                return HttpResponse::InternalServerError().body(e.to_string());
+            }
+            match delete_by_id::<User::Entity, _>(db.get_ref(), u.id).await {
+                Ok(_) => HttpResponse::Ok().finish(),
+                Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+            }
         }
         Ok(None) => HttpResponse::NotFound().finish(),
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }
 
-
 pub fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/user")
-        .service(get)
-        .service(pass)
-        .service(put)
-        .service(delete));
+    cfg.service(
+        web::scope("/user")
+            .service(get)
+            .service(pass)
+            .service(put)
+            .service(delete)
+    );
 }
