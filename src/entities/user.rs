@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, ToSchema)]
 #[sea_orm(table_name = "users")]
 pub struct Model {
-    #[sea_orm(primary_key)]
+    #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
 
     #[sea_orm(unique)]
@@ -46,7 +46,40 @@ pub enum State {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_one = "crate::entities::state::Entity")]
+    State,
+    #[sea_orm(has_one = "crate::entities::partner::Entity")]
+    Partner,
+    #[sea_orm(has_one = "crate::entities::employee::Entity")]
+    Employee,
+    #[sea_orm(has_one = "crate::entities::admin::Entity")]
+    Admin,
+}
+
+impl Related<crate::entities::state::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::State.def()
+    }
+}
+
+impl Related<crate::entities::partner::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Partner.def()
+    }
+}
+
+impl Related<crate::entities::employee::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Employee.def()
+    }
+}
+
+impl Related<crate::entities::admin::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Admin.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}
 

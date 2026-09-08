@@ -52,7 +52,7 @@ curl -s -o /dev/null -w "Code HTTP: %{http_code}\n" -X POST "$BASE_URL/user/pass
 echo -e "\n--- EMPLOYEE ---"
 echo "Creation:"
 curl -s -X POST "$BASE_URL/employees" -H "Content-Type: application/json" \
-  -d "{\"id\": \"$USER_ID\", \"balance\": 150.75}" | jq .
+  -d "{\"id\": \"$USER_ID\", \"balance\": 150.75, \"qr_token\": \"token_demo\"}" | jq .
 echo "Getting (All):"
 curl -s -X GET "$BASE_URL/employees" | jq .
 echo "Update:"
@@ -84,6 +84,26 @@ curl -s -X GET "$BASE_URL/admins/$USER_ID" | jq .
 
 echo -e "\n-> GET /v1/admin/transactions.csv"
 curl -s -i -X GET "$BASE_URL/v1/admin/transactions.csv" | head -n 5
+
+echo -e "\n-> POST /partners/$USER_ID/click (per click)"
+curl -s -X POST "$BASE_URL/partners/$USER_ID/click" | jq .
+
+echo -e "\n-> PUT /states/$USER_ID (to waiting_activation)"
+curl -s -X PUT "$BASE_URL/states/$USER_ID" -H "Content-Type: application/json" \
+  -d '{"state": "waiting_activation", "reason": "Validation admin requise"}' | jq .
+
+echo -e "\n-> GET /admin/partners/pending (Lists pending partners)"
+curl -s -X GET "$BASE_URL/admin/partners/pending" | jq .
+
+echo -e "\n-> POST /payments (Executes a payment)"
+curl -s -X POST "$BASE_URL/payments" -H "Content-Type: application/json" \
+  -d "{\"qr_token\": \"token_demo\", \"partner_id\": \"$USER_ID\", \"amount\": 15.00}" | jq .
+
+echo -e "\n-> GET /employees/$USER_ID/transactions (Employee's transactions history)"
+curl -s -X GET "$BASE_URL/employees/$USER_ID/transactions" | jq .
+
+echo -e "\n-> GET /partners/$USER_ID/transactions (Partner's transactions history)"
+curl -s -X GET "$BASE_URL/partners/$USER_ID/transactions" | jq .
 
 echo "Deleting relations..."
 curl -s -o /dev/null -w "Admin deleted: %{http_code}\n" -X DELETE "$BASE_URL/admins/$USER_ID"

@@ -9,11 +9,13 @@ use uuid::Uuid;
 pub struct CreateEmployeeDto {
     pub id: Uuid,
     pub balance: Option<f32>,
+    pub qr_token: Option<String>,
 }
 
 #[derive(Deserialize)]
 pub struct UpdateEmployeeDto {
     pub balance: Option<f32>,
+    pub qr_token: Option<String>,
 }
 
 pub struct EmployeeAdapter;
@@ -26,6 +28,7 @@ impl CrudAdapter<employee::Entity> for EmployeeAdapter {
         employee::ActiveModel {
             id: ActiveValue::Set(dto.id),
             balance: ActiveValue::Set(dto.balance),
+            qr_token: ActiveValue::Set(dto.qr_token),
             ..Default::default()
         }
     }
@@ -34,6 +37,9 @@ impl CrudAdapter<employee::Entity> for EmployeeAdapter {
         let mut am = model.into_active_model();
         if let Some(b) = dto.balance {
             am.balance = ActiveValue::Set(Some(b));
+        }
+        if let Some(q) = dto.qr_token {
+            am.qr_token = ActiveValue::Set(Some(q));
         }
         am
     }
@@ -65,6 +71,7 @@ impl CrudAdapter<partner::Entity> for PartnerAdapter {
             siren: ActiveValue::Set(dto.siren),
             social_obj: ActiveValue::Set(dto.social_obj),
             category: ActiveValue::Set(dto.category),
+            clicks: ActiveValue::Set(0),
             ..Default::default()
         }
     }

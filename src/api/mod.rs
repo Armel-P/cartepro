@@ -5,6 +5,7 @@ use crate::{
 use utoipa::OpenApi;
 
 mod auth;
+mod business;
 mod crud;
 mod echo;
 mod health;
@@ -24,6 +25,11 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .service(echo::echo)
             .service(csv::transactions_to_csv)
             .configure(user::configure)
+            .service(business::get_pending_partners)
+            .service(business::track_partner_click)
+            .service(business::process_payment)
+            .service(business::get_employee_transactions)
+            .service(business::get_partner_transactions)
             .configure(auth::configure)
             .configure(docs::configure)
             .service(crud::crud_scope::<employee::Entity, EmployeeAdapter>(
