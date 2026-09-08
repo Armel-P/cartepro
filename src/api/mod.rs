@@ -57,10 +57,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         business::process_payment,
         business::get_employee_transactions,
         business::get_partner_transactions,
+        business::get_users,
         auth::login,
         auth::register,
-        business::get_pending_partners,
-        business::get_users,
     ),
     components(
         schemas(
