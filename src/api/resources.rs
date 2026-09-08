@@ -71,7 +71,6 @@ impl CrudAdapter<partner::Entity> for PartnerAdapter {
             siren: ActiveValue::Set(dto.siren),
             social_obj: ActiveValue::Set(dto.social_obj),
             category: ActiveValue::Set(dto.category),
-            clicks: ActiveValue::Set(0),
             ..Default::default()
         }
     }

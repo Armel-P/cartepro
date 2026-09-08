@@ -27,7 +27,7 @@ CREATE TABLE partner (
   siren INT4 UNIQUE,
   social_obj VARCHAR(255),
   verification BOOL,
-  category VARCHAR(255),
+  category VARCHAR(255)
 );
 
 CREATE TABLE admin (
@@ -41,4 +41,4 @@ CREATE TABLE transaction (
   value REAL,
   partner_id UUID REFERENCES partner(id),
   employee_id UUID REFERENCES employee(id)
-) 
+);

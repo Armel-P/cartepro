@@ -48,6 +48,22 @@ pub async fn login(
             if user.password != body.password {
                 return HttpResponse::Unauthorized().body("Wrong password.");
             }
+
+            match State::Entity::find_by_id(user.id).one(db.get_ref()).await {
+                Ok(Some(state)) if state.state != "active" => {
+                    let message = match state.state.as_str() {
+                        "waiting_activation" => {
+                            "Votre compte est en attente de validation par un administrateur."
+                        }
+                        "suspended" => "Votre compte a été suspendu.",
+                        _ => "Votre compte n'est pas actif.",
+                    };
+                    return HttpResponse::Forbidden().body(message);
+                }
+                Ok(_) => {}
+                Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
+            }
+
             HttpResponse::Ok().json(AuthResponse {
                 id: user.id,
                 mail: user.mail.clone(),
@@ -159,7 +175,7 @@ pub async fn register(
             };
             let state_model = State::ActiveModel {
                 id: ActiveValue::Set(inserted_user.id),
-                state: ActiveValue::Set("waiting".to_string()),
+                state: ActiveValue::Set("waiting_activation".to_string()),
                 reason: ActiveValue::Set(Some("Waiting for verification".to_string())),
                 modified_at: ActiveValue::Set(chrono::Utc::now().timestamp())
             };

@@ -15,7 +15,6 @@ pub struct Model {
     pub social_obj: Option<String>,
     pub verification: Option<bool>,
     pub category: Option<String>,
-    pub clicks: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

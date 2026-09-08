@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import {
   Card,
@@ -12,6 +12,7 @@ import { Input } from "../../components/ui/input"
 import { Switch } from "../../components/ui/switch"
 import { Separator } from "../../components/ui/separator"
 import { Watermark } from "../../components/Watermark"
+import { api } from "../../api"
 
 type Role = "admin" | "partner" | "employee"
 type AccountState = "active" | "suspended" | "waiting_activation"
@@ -23,6 +24,15 @@ type UserAccount = {
   role: Role
   state: AccountState
   createdAt: string
+}
+
+type UserSummaryApi = {
+  id: string
+  name: string
+  mail: string
+  role: "Admin" | "Partner" | "Manant"
+  state: string | null
+  created_at: number
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -38,80 +48,27 @@ const ROLE_FILTERS: { value: Role | "all"; label: string }[] = [
   { value: "admin", label: "Admins" },
 ]
 
-const PLACEHOLDER_USERS: UserAccount[] = [
-  {
-    id: "1",
-    name: "Jean-Eudes Berlier",
-    mail: "j.berlier@cartepro-demo.fr",
-    role: "admin",
-    state: "active",
-    createdAt: "12 janvier 2026",
-  },
-  {
-    id: "2",
-    name: "Thomas Vignal",
-    mail: "t.vignal@cartepro-demo.fr",
-    role: "admin",
-    state: "active",
-    createdAt: "12 janvier 2026",
-  },
-  {
-    id: "3",
-    name: "Poney Dream 78",
-    mail: "contact@poneydream78.fr",
-    role: "partner",
-    state: "active",
-    createdAt: "15 août 2026",
-  },
-  {
-    id: "4",
-    name: "KostumParty",
-    mail: "boutique@kostumparty.fr",
-    role: "partner",
-    state: "active",
-    createdAt: "18 août 2026",
-  },
-  {
-    id: "5",
-    name: "Glaces Artisanales Corrèze",
-    mail: "commande@glaces-correze.fr",
-    role: "partner",
-    state: "waiting_activation",
-    createdAt: "2 septembre 2026",
-  },
-  {
-    id: "6",
-    name: "Chapelier Fontaine",
-    mail: "contact@chapelier-fontaine.fr",
-    role: "partner",
-    state: "active",
-    createdAt: "20 août 2026",
-  },
-  {
-    id: "7",
-    name: "Claire Dubosc",
-    mail: "claire.dubosc@example.fr",
-    role: "employee",
-    state: "active",
-    createdAt: "3 septembre 2026",
-  },
-  {
-    id: "8",
-    name: "Nadia Ferrand",
-    mail: "nadia.ferrand@example.fr",
-    role: "employee",
-    state: "active",
-    createdAt: "3 septembre 2026",
-  },
-  {
-    id: "9",
-    name: "Mehdi Larbi",
-    mail: "mehdi.larbi@example.fr",
-    role: "employee",
-    state: "suspended",
-    createdAt: "28 août 2026",
-  },
-]
+const API_ROLE_TO_ROLE: Record<UserSummaryApi["role"], Role> = {
+  Admin: "admin",
+  Partner: "partner",
+  Manant: "employee",
+}
+
+const ACCOUNT_STATES: AccountState[] = ["active", "suspended", "waiting_activation"]
+
+function toAccountState(state: string | null): AccountState {
+  return ACCOUNT_STATES.includes(state as AccountState)
+    ? (state as AccountState)
+    : "active"
+}
+
+function formatDate(value: number): string {
+  return new Date(value * 1000).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+}
 
 function StateBadge({ state }: { state: AccountState }) {
   const styles: Record<AccountState, string> = {
@@ -134,9 +91,41 @@ function StateBadge({ state }: { state: AccountState }) {
 }
 
 export default function AdminUserListPage() {
-  const [users, setUsers] = useState<UserAccount[]>(PLACEHOLDER_USERS)
+  const [users, setUsers] = useState<UserAccount[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState<Role | "all">("all")
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    api<UserSummaryApi[]>("/admin/users")
+      .then((data) => {
+        if (cancelled) return
+        setUsers(
+          data.map((u) => ({
+            id: u.id,
+            name: u.name,
+            mail: u.mail,
+            role: API_ROLE_TO_ROLE[u.role],
+            state: toAccountState(u.state),
+            createdAt: formatDate(u.created_at),
+          })),
+        )
+        setError(null)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setError("Impossible de récupérer la liste des comptes.")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -167,15 +156,24 @@ export default function AdminUserListPage() {
   }
 
   return (
-    <Watermark text="SIMULATION GESTION DES COMPTES">
+    <Watermark text="COMPTES RÉELS — SUSPENSION NON PERSISTÉE">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <div>
           <h1 className="text-2xl font-semibold">Gestion des comptes</h1>
           <p className="text-sm text-muted-foreground">
-            {users.length} comptes au total — {activeCount} actifs,{" "}
-            {suspendedCount} suspendu{suspendedCount > 1 ? "s" : ""}.
+            {loading
+              ? "Chargement…"
+              : `${users.length} comptes au total — ${activeCount} actifs, ${suspendedCount} suspendu${suspendedCount > 1 ? "s" : ""}.`}
           </p>
         </div>
+
+        {error && (
+          <Card>
+            <CardContent className="py-8 text-center text-sm text-destructive">
+              {error}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
