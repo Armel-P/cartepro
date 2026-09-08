@@ -169,7 +169,7 @@ INSERT INTO state (id, state, reason, modified_at) VALUES
 --
 -- 1. users table
 INSERT INTO users (id, mail, name, password, role, created_at) VALUES
-('22222222-2222-2222-2222-000000000001', 'contact@la-ferme-du-coin.fr', 'Guillaume Robert', '$2b$12$zGD9pnLwddsFM41PREsIa2gBi4qUxWzxczdKJmxJseyGCWJr0NRNh', 'partner', 1762678800),
+('22222222-2222-2222-2222-000000000001', 'contact@la-ferme-du-coin.fr', 'Guillaume Robert', 'd6044b82d848296e50256fd988227d154f1d4dcc7f792bdf615608e0ab47c42a', 'partner', 1762678800),
 ('22222222-2222-2222-2222-000000000002', 'contact@le-comptoir-gourmand.fr', 'Vincent Mathieu', '$2b$12$xWjmMGzGccciTvZEHDjM5Giu7NukzNV1tLvG1GIFTKtE0bxvRhALt', 'partner', 1779094800),
 ('22222222-2222-2222-2222-000000000003', 'contact@le-petit-bouchon.fr', 'Sebastien Lambert', '$2b$12$LKoUdLEkHOUNX1yj0RpcK8ShmbCuAjASnAGXN6E32VUdTiHnJuQEH', 'partner', 1756976400),
 ('22222222-2222-2222-2222-000000000004', 'contact@bistrot-des-halles.fr', 'Vincent Henry', '$2b$12$RX3URPZSqNEm9prJto8tXsTnSTFuEwJ77YUrshKRIy5z0w9XZjscs', 'partner', 1769504400),

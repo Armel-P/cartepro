@@ -26,6 +26,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .service(csv::transactions_to_csv)
             .configure(user::configure)
             .service(business::get_pending_partners)
+            .service(business::get_partner_directory)
             .service(business::get_users)
             .service(business::process_payment)
             .service(business::get_employee_transactions)
@@ -54,6 +55,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         user::put,
         user::delete,
         business::get_pending_partners,
+        business::get_partner_directory,
         business::process_payment,
         business::get_employee_transactions,
         business::get_partner_transactions,
@@ -68,7 +70,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             // partner::Model, employee::Model, state::Model, admin::Model,
             business::PaymentRequest, // transaction::Model,
             auth::LoginRequest, auth::RegisterRequest, auth::AuthResponse,
-            business::PendingPartner, business::UserSummary,
+            business::PendingPartner, business::UserSummary, business::PartnerDirectoryEntry,
         )
     )
 )]

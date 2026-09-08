@@ -1,6 +1,6 @@
-import SettingsForm from "../../components/settings-form"
+import SettingsForm from "../components/settings-form"
 
-export default function EmployeeSettingsPage() {
+export default function SettingsPage() {
 
   return (
     <main className="mt-5 mb-5 flex items-center justify-center">

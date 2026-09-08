@@ -96,6 +96,8 @@ export default function AdminUserListPage() {
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState<Role | "all">("all")
+  const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [toggleError, setToggleError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -142,21 +144,35 @@ export default function AdminUserListPage() {
   const activeCount = users.filter((u) => u.state === "active").length
   const suspendedCount = users.filter((u) => u.state === "suspended").length
 
-  function toggleSuspended(id: string) {
-    setUsers((list) =>
-      list.map((user) =>
-        user.id === id
-          ? {
-              ...user,
-              state: user.state === "suspended" ? "active" : "suspended",
-            }
-          : user,
-      ),
-    )
+  async function toggleSuspended(user: UserAccount) {
+    const nextState: AccountState =
+      user.state === "suspended" ? "active" : "suspended"
+    setToggleError(null)
+    setTogglingId(user.id)
+    try {
+      await api(`/states/${user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          state: nextState,
+          reason:
+            nextState === "suspended"
+              ? "Suspendu par un administrateur"
+              : "Réactivé par un administrateur",
+        }),
+      })
+      setUsers((list) =>
+        list.map((u) => (u.id === user.id ? { ...u, state: nextState } : u)),
+      )
+    } catch {
+      setToggleError(`Impossible de modifier le statut de "${user.name}".`)
+    } finally {
+      setTogglingId(null)
+    }
   }
 
   return (
-    <Watermark text="COMPTES RÉELS — SUSPENSION NON PERSISTÉE">
+    <Watermark text="COMPTES ET SUSPENSIONS RÉELS">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <div>
           <h1 className="text-2xl font-semibold">Gestion des comptes</h1>
@@ -173,6 +189,10 @@ export default function AdminUserListPage() {
               {error}
             </CardContent>
           </Card>
+        )}
+
+        {toggleError && (
+          <p className="text-sm text-destructive">{toggleError}</p>
         )}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -236,10 +256,15 @@ export default function AdminUserListPage() {
                           </Link>
                         ) : (
                           <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                            {user.state === "active" ? "Actif" : "Suspendu"}
+                            {togglingId === user.id
+                              ? "…"
+                              : user.state === "active"
+                                ? "Actif"
+                                : "Suspendu"}
                             <Switch
                               checked={user.state === "active"}
-                              onCheckedChange={() => toggleSuspended(user.id)}
+                              disabled={togglingId === user.id}
+                              onCheckedChange={() => toggleSuspended(user)}
                             />
                           </label>
                         )}

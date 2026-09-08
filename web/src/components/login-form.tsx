@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { cn } from "../lib/utils"
-import { api } from "../api"
+import { api, ApiError } from "../api"
 import { hashPassword } from "../lib/hash"
 import { setUser, type AuthUser } from "../auth"
 import { Button } from "../components/ui/button"
@@ -48,8 +48,10 @@ export function LoginForm({
       setUser(user)
       navigate(AFTER_LOGIN_ROUTE, { replace: true })
     } catch (err) {
-      if (err instanceof Error && err.message.includes("401")) {
+      if (err instanceof ApiError && err.status === 401) {
         setError("E-mail ou mot de passe incorrect.")
+      } else if (err instanceof ApiError && err.status === 403) {
+        setError(err.message)
       } else {
         setError("Connexion impossible. Réessayez plus tard.")
       }

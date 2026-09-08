@@ -1,3 +1,12 @@
+export class ApiError extends Error {
+  status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
 export async function api<T>(
   path: string,
   options?: RequestInit,
@@ -5,8 +14,10 @@ export async function api<T>(
   const response = await fetch(`/api${path}`, options);
 
   if (!response.ok) {
-    throw new Error(
-      `API request failed: ${response.status}`,
+    const body = await response.text().catch(() => "");
+    throw new ApiError(
+      response.status,
+      body || `API request failed: ${response.status}`,
     );
   }
 
