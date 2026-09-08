@@ -53,6 +53,10 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         user::pass,
         user::put,
         user::delete,
+        business::get_pending_partners,
+        business::process_payment,
+        business::get_employee_transactions,
+        business::get_partner_transactions,
         auth::login,
         auth::register,
     ),
@@ -60,7 +64,10 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         schemas(
             Role,
             user::GetResponse, user::PassRequest, user::PutRequest,
+            // partner::Model, employee::Model, state::Model, admin::Model,
+            business::PaymentRequest, // transaction::Model,
             auth::LoginRequest, auth::RegisterRequest, auth::AuthResponse,
+            business::ErrorResponse
         )
     )
 )]
