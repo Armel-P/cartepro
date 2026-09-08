@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+
 import {
   Card,
   CardContent,
@@ -6,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card"
+
 import { Separator } from "../../components/ui/separator"
 import { Watermark } from "../../components/Watermark"
 import { api } from "../../api"
@@ -16,8 +18,36 @@ type Employee = {
   balance: number | null
 }
 
+type ApiTransaction = {
+  id: string
+  timestamp: number
+  success: boolean
+  value: number
+  partner_id: string
+  employee_id: string
+}
+
+type Transaction = {
+  id: string
+  label: string
+  date: string
+  amount: string
+  direction: "debit" | "credit"
+}
+
 function formatBalance(value: number): string {
-  return value.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })
+  return value.toLocaleString("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+  })
+}
+
+function formatDate(timestamp: number): string {
+  return new Date(timestamp * 1000).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
 }
 
 const POSITIVE_BALANCE_MESSAGES: ((amount: string) => string)[] = [
@@ -38,34 +68,20 @@ function pickRandomMessage(amount: string): string {
     POSITIVE_BALANCE_MESSAGES[
       Math.floor(Math.random() * POSITIVE_BALANCE_MESSAGES.length)
     ]
+
   return template(amount)
 }
 
-type Transaction = {
-  id: string
-  label: string
-  date: string
-  amount: string
-  direction: "debit" | "credit"
-}
-
-const PLACEHOLDER_TRANSACTIONS: Transaction[] = [
-  { id: "1", label: "Déjeuner — Le Bistrot", date: "31 août 2026", amount: "-12,50 €", direction: "debit" },
-  { id: "2", label: "Rechargement du compte", date: "28 août 2026", amount: "+50,00 €", direction: "credit" },
-  { id: "3", label: "Déjeuner — Sushi Corner", date: "27 août 2026", amount: "-15,90 €", direction: "debit" },
-  { id: "4", label: "Déjeuner — Boulangerie Martin", date: "26 août 2026", amount: "-6,40 €", direction: "debit" },
-  { id: "5", label: "Rechargement du compte", date: "21 août 2026", amount: "+50,00 €", direction: "credit" },
-  { id: "6", label: "Rechargement du compte", date: "25 août 2026", amount: "+10,00 €", direction: "credit" },
-]
-
 export default function BalancePage() {
   const [balance, setBalance] = useState<number | null>(null)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const user = getUser()
+
     if (!user) {
       setError("Vous devez être connecté pour consulter votre solde.")
       setLoading(false)
@@ -73,19 +89,41 @@ export default function BalancePage() {
     }
 
     let cancelled = false
+
     setLoading(true)
-    api<Employee>(`/employees/${user.id}`)
-      .then((employee) => {
+
+    Promise.all([
+      api<Employee>(`/employees/${user.id}`),
+      api<ApiTransaction[]>(`/employees/${user.id}/transactions`),
+    ])
+      .then(([employee, apiTransactions]) => {
         if (cancelled) return
+
         setBalance(employee.balance ?? null)
+
+        const formattedTransactions: Transaction[] = apiTransactions
+          .filter((transaction) => transaction.success)
+          .sort((a, b) => b.timestamp - a.timestamp)
+          .map((transaction) => ({
+            id: transaction.id,
+            label: "Paiement chez un partenaire",
+            date: formatDate(transaction.timestamp),
+            amount: `-${formatBalance(transaction.value)}`,
+            direction: "debit",
+          }))
+
+        setTransactions(formattedTransactions)
         setError(null)
       })
       .catch(() => {
         if (cancelled) return
-        setError("Impossible de récupérer votre solde pour le moment.")
+
+        setError("Impossible de récupérer vos données pour le moment.")
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       })
 
     return () => {
@@ -100,13 +138,14 @@ export default function BalancePage() {
   }, [balance])
 
   return (
-    <Watermark text="SOLDE RÉEL — HISTORIQUE SIMULÉ">
+    <Watermark text="SOLDE RÉEL — HISTORIQUE RÉEL">
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6 md:p-10">
         <h1 className="text-2xl font-semibold">Mon solde</h1>
 
         <Card>
           <CardHeader>
             <CardDescription>Solde disponible</CardDescription>
+
             <CardTitle className="text-4xl">
               {loading
                 ? "…"
@@ -115,9 +154,12 @@ export default function BalancePage() {
                   : "—"}
             </CardTitle>
           </CardHeader>
+
           <CardContent>
             {error ? (
-              <p className="text-sm text-destructive">{error}</p>
+              <p className="text-sm text-destructive">
+                {error}
+              </p>
             ) : (
               !loading &&
               message && (
@@ -132,35 +174,52 @@ export default function BalancePage() {
         <Card>
           <CardHeader>
             <CardTitle>Historique des transactions</CardTitle>
-            <CardDescription>Vos derniers mouvements de compte</CardDescription>
+
+            <CardDescription>
+              Vos derniers mouvements de compte
+            </CardDescription>
           </CardHeader>
+
           <CardContent>
-            <ul className="flex flex-col scroll-auto scrollbar-none gap-2 overflow-y-auto max-h-100">
-              {PLACEHOLDER_TRANSACTIONS.map((transaction, index) => (
-                <li key={transaction.id}>
-                  <div className="flex items-center justify-between gap-4 py-3">
-                    <div className="flex flex-col">
-                      <span className="font-medium text-foreground">
-                        {transaction.label}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {transaction.date}
+            {loading ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                Chargement de vos transactions…
+              </p>
+            ) : transactions.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                Aucune transaction pour le moment.
+              </p>
+            ) : (
+              <ul className="flex max-h-100 flex-col gap-2 overflow-y-auto scroll-auto scrollbar-none">
+                {transactions.map((transaction, index) => (
+                  <li key={transaction.id}>
+                    <div className="flex items-center justify-between gap-4 py-3">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">
+                          {transaction.label}
+                        </span>
+
+                        <span className="text-sm text-muted-foreground">
+                          {transaction.date}
+                        </span>
+                      </div>
+
+                      <span
+                        className={
+                          transaction.direction === "credit"
+                            ? "font-medium text-positive"
+                            : "font-medium text-negative"
+                        }
+                      >
+                        {transaction.amount}
                       </span>
                     </div>
-                    <span
-                      className={
-                        transaction.direction === "credit"
-                          ? "font-medium text-positive"
-                          : "font-medium text-negative"
-                      }
-                    >
-                      {transaction.amount}
-                    </span>
-                  </div>
-                  {index < PLACEHOLDER_TRANSACTIONS.length - 1 && <Separator />}
-                </li>
-              ))}
-            </ul>
+
+                    {index < transactions.length - 1 && <Separator />}
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </main>
