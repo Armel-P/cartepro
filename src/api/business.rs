@@ -5,10 +5,24 @@ use sea_orm::{
     sea_query::{ExprTrait},
 };
 use serde::Deserialize;
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::entities::{employee, partner, state, transaction, user};
 
+#[derive(ToSchema)]
+pub struct ErrorResponse {
+    pub error: String,
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/admin/partners/pending",
+    responses(
+        (status = 200, description = "Successfully retrieved pending partners", content_type = "application/json", body = [partner::Model]),
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
+    )
+)]
 #[get("/admin/partners/pending")]
 pub async fn get_pending_partners(db: web::Data<DatabaseConnection>) -> impl Responder {
     let pending_partners = partner::Entity::find()
@@ -53,13 +67,23 @@ pub async fn get_pending_partners(db: web::Data<DatabaseConnection>) -> impl Res
 //     }
 // }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct PaymentRequest {
     pub qr_token: String,
     pub partner_id: Uuid,
     pub amount: f32,
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/payments",
+    request_body = PaymentRequest,
+    responses(
+        (status = 200, description = "Successfully processed payment", content_type = "application/json", body = transaction::Model),
+        (status = 400, description = "Invalid request data", content_type = "application/json", body = ErrorResponse),
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
+    )
+)]
 #[post("/payments")]
 pub async fn process_payment(
     db: web::Data<DatabaseConnection>,
@@ -119,6 +143,14 @@ pub async fn process_payment(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/employees/{id}/transactions",
+    responses(
+        (status = 200, description = "Successfully retrieved transactions", content_type = "application/json", body = [transaction::Model]),
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
+    )
+)]
 #[get("/employees/{id}/transactions")]
 pub async fn get_employee_transactions(
     db: web::Data<DatabaseConnection>,
@@ -137,6 +169,14 @@ pub async fn get_employee_transactions(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/partners/{id}/transactions",
+    responses(
+        (status = 200, description = "Successfully retrieved transactions", content_type = "application/json", body = [transaction::Model]),
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
+    )
+)]
 #[get("/partners/{id}/transactions")]
 pub async fn get_partner_transactions(
     db: web::Data<DatabaseConnection>,
