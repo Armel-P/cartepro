@@ -27,7 +27,8 @@ CREATE TABLE partner (
   siren INT4 UNIQUE,
   social_obj VARCHAR(255),
   verification BOOL,
-  category VARCHAR(255)
+  category VARCHAR(255),
+  clicks INT4 NOT NULL DEFAULT 0
 );
 
 CREATE TABLE admin (
