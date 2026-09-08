@@ -9,6 +9,11 @@ use uuid::Uuid;
 
 use crate::entities::{employee, partner, state, transaction, user};
 
+#[derive (ToShema)]
+pub struct ErrorResponse {
+    pub error: String
+}
+
 #[derive(Serialize, ToSchema, FromQueryResult)]
 pub struct PendingPartner {
     pub id: Uuid,
@@ -24,7 +29,7 @@ pub struct PendingPartner {
     path = "/api/admin/partners/pending",
     responses(
         (status = 200, description = "Partners waiting for admin validation", content_type = "application/json", body = [PendingPartner]),
-        (status = 500, description = "Internal server error")
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
     )
 )]
 #[get("/admin/partners/pending")]
@@ -67,7 +72,7 @@ pub struct UserSummary {
     path = "/api/admin/users",
     responses(
         (status = 200, description = "All user accounts with their current state", content_type = "application/json", body = [UserSummary]),
-        (status = 500, description = "Internal server error")
+        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
     )
 )]
 #[get("/admin/users")]
