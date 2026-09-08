@@ -116,7 +116,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <div className="grid grid-cols-2 gap-3">
                 <FieldLabel
                   htmlFor="role-Manant"
-                  className="has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5"
+                  className="has-checked:border-primary/40 has-checked:bg-primary/5"
                 >
                   <Field orientation="horizontal">
                     <input
@@ -137,7 +137,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 </FieldLabel>
                 <FieldLabel
                   htmlFor="role-Partner"
-                  className="has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5"
+                  className="has-checked:border-primary/40 has-checked:bg-primary/5"
                 >
                   <Field orientation="horizontal">
                     <input
