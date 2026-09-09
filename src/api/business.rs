@@ -15,43 +15,6 @@ pub struct ErrorResponse {
 }
 
 #[derive(Serialize, ToSchema, FromQueryResult)]
-pub struct PartnerDirectoryEntry {
-    pub id: Uuid,
-    pub social_obj: Option<String>,
-    pub category: Option<String>,
-}
-
-#[utoipa::path(
-    get,
-    path = "/api/directory",
-    responses(
-        (status = 200, description = "Active partners referenced by the ministry", content_type = "application/json", body = [PartnerDirectoryEntry]),
-        (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
-    )
-)]
-#[get("/directory")]
-pub async fn get_partner_directory(db: web::Data<DatabaseConnection>) -> impl Responder {
-    let partners = partner::Entity::find()
-        .join(sea_orm::JoinType::InnerJoin, partner::Relation::User.def())
-        .join(sea_orm::JoinType::InnerJoin, user::Relation::State.def())
-        .filter(state::Column::State.eq("active"))
-        .select_only()
-        .column(partner::Column::Id)
-        .column(partner::Column::SocialObj)
-        .column(partner::Column::Category)
-        .into_model::<PartnerDirectoryEntry>()
-        .all(db.get_ref())
-        .await;
-
-    match partners {
-        Ok(partners) => HttpResponse::Ok().json(partners),
-        Err(e) => {
-            HttpResponse::InternalServerError().json(serde_json::json!({ "error": e.to_string() }))
-        }
-    }
-}
-
-#[derive(Serialize, ToSchema, FromQueryResult)]
 pub struct PendingPartner {
     pub id: Uuid,
     pub name: String,
@@ -142,6 +105,17 @@ pub struct PaymentRequest {
     pub amount: f32,
 }
 
+#[derive(Serialize, ToSchema, FromQueryResult)]
+pub struct EmployeeTransaction {
+    pub id: Uuid,
+    pub timestamp: i64,
+    pub success: bool,
+    pub value: f32,
+    pub partner_id: Uuid,
+    pub employee_id: Uuid,
+    pub partner_name: String,
+}
+
 #[utoipa::path(
     post,
     path = "/api/payments",
@@ -215,7 +189,7 @@ pub async fn process_payment(
     get,
     path = "/api/employees/{id}/transactions",
     responses(
-        (status = 200, description = "Successfully retrieved transactions", content_type = "application/json", body = [transaction::Model]),
+        (status = 200, description = "Successfully retrieved transactions", content_type = "application/json", body = [EmployeeTransaction]),
         (status = 500, description = "Internal server error", content_type = "application/json", body = ErrorResponse)
     )
 )]
@@ -225,7 +199,18 @@ pub async fn get_employee_transactions(
     id: web::Path<Uuid>,
 ) -> impl Responder {
     let res = transaction::Entity::find()
+        .join(sea_orm::JoinType::InnerJoin, transaction::Relation::Partner.def())
+        .join(sea_orm::JoinType::InnerJoin, partner::Relation::User.def())
         .filter(transaction::Column::EmployeeId.eq(id.into_inner()))
+        .select_only()
+        .column(transaction::Column::Id)
+        .column(transaction::Column::Timestamp)
+        .column(transaction::Column::Success)
+        .column(transaction::Column::Value)
+        .column(transaction::Column::PartnerId)
+        .column(transaction::Column::EmployeeId)
+        .column_as(user::Column::Name, "partner_name")
+        .into_model::<EmployeeTransaction>()
         .all(db.get_ref())
         .await;
 
