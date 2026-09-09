@@ -5,7 +5,7 @@ use crate::{
 use utoipa::OpenApi;
 
 mod auth;
-mod business;
+mod buisness;
 mod crud;
 mod echo;
 mod health;
@@ -25,12 +25,12 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .service(echo::echo)
             .service(csv::transactions_to_csv)
             .configure(user::configure)
-            .service(business::get_pending_partners)
-            .service(business::get_partner_directory)
-            .service(business::get_users)
-            .service(business::process_payment)
-            .service(business::get_employee_transactions)
-            .service(business::get_partner_transactions)
+            .service(buisness::get_pending_partners)
+            .service(buisness::get_users)
+            .service(buisness::process_payment)
+            .service(buisness::begin_payment)
+            .service(buisness::get_employee_transactions)
+            .service(buisness::get_partner_transactions)
             .configure(auth::configure)
             .configure(docs::configure)
             .service(crud::crud_scope::<employee::Entity, EmployeeAdapter>(
@@ -54,12 +54,12 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         user::pass,
         user::put,
         user::delete,
-        business::get_pending_partners,
-        business::get_partner_directory,
-        business::process_payment,
-        business::get_employee_transactions,
-        business::get_partner_transactions,
-        business::get_users,
+        buisness::get_pending_partners,
+        buisness::process_payment,
+        buisness::begin_payment,
+        buisness::get_employee_transactions,
+        buisness::get_partner_transactions,
+        buisness::get_users,
         auth::login,
         auth::register,
     ),
@@ -68,9 +68,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             Role,
             user::GetResponse, user::PassRequest, user::PutRequest,
             // partner::Model, employee::Model, state::Model, admin::Model,
-            business::PaymentRequest, // transaction::Model,
+            buisness::PaymentRequest, // transaction::Model,
             auth::LoginRequest, auth::RegisterRequest, auth::AuthResponse,
-            business::PendingPartner, business::UserSummary, business::PartnerDirectoryEntry,
+            buisness::PendingPartner, buisness::UserSummary, buisness::EmployeeTransaction,
         )
     )
 )]
