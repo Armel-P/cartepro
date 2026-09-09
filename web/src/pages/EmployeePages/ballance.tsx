@@ -25,6 +25,7 @@ type ApiTransaction = {
   value: number
   partner_id: string
   employee_id: string
+  partner_name: string
 }
 
 type Transaction = {
@@ -106,7 +107,7 @@ export default function BalancePage() {
           .sort((a, b) => b.timestamp - a.timestamp)
           .map((transaction) => ({
             id: transaction.id,
-            label: "Paiement chez un partenaire",
+            label: `Paiement chez ${transaction.partner_name}`,
             date: formatDate(transaction.timestamp),
             amount: `-${formatBalance(transaction.value)}`,
             direction: "debit",
